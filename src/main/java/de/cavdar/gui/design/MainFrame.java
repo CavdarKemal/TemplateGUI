@@ -517,8 +517,21 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         LOG.info("Reloading all settings");
         isReloading = true;
         try {
-            // Reload DB connections
+            // Reload DB connections from new config
             ConnectionManager.reloadConnections();
+
+            // Explicitly reload DB connections ComboBox with value from NEW config
+            if (cbDbConnections != null) {
+                cbDbConnections.removeAllItems();
+                for (String name : ConnectionManager.getConnectionNames()) {
+                    cbDbConnections.addItem(name);
+                }
+                String lastConn = ConnectionManager.getLastConnectionName();
+                if (!lastConn.isEmpty()) {
+                    cbDbConnections.setSelectedItem(lastConn);
+                }
+                LOG.info("DB connection set to: {}", lastConn);
+            }
 
             // Reload comboboxes
             if (cbSources != null) {
