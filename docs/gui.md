@@ -52,7 +52,7 @@ Die TemplateGUI ist eine Java Swing MDI-Anwendung (Multiple Document Interface) 
 ## Package-Struktur
 
 ```
-de.template.gui
+de.cavdar.gui
 ├── design/                          # GUI-Komponenten
 │   ├── BaseViewPanel.java           # Basis-Panel mit Toolbar/Status
 │   ├── MainFrame.java               # Hauptfenster mit Dual-Toolbar Layout
@@ -162,7 +162,7 @@ Erstellen Sie ein neues Panel in JFormDesigner (z.B. `InternalFrameMyView.java`)
 ### Schritt 2: Panel-Wrapper erstellen
 
 ```java
-package de.template.gui.design;
+package de.cavdar.gui.design;
 
 import de.cavdar.gui.design.BaseViewPanel;
 
@@ -200,7 +200,7 @@ public class MyViewPanel extends BaseViewPanel {
 ### Schritt 3: View-Klasse erstellen
 
 ```java
-package de.template.gui.view;
+package de.cavdar.gui.view;
 
 import de.cavdar.gui.view.BaseView;
 

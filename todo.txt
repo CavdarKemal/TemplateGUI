@@ -1,13 +1,8 @@
-Folgendes habe ich geändert:
-1. das Verzeichnis "TemplateGUI\delivery" aufgeräumt:
-    - Konfigurationsdatei config.properties umbenannt in ene.config.properties
-    - startGUI überarbeitet
-2. das Verzeichnis "TemplateGUI\docker\config" aufgeräumt
-3. die Datei src/assembly/distribution.xml überarbeitet
+Folgendes habe ich geändert: Package wieder auf de.cavdar refactored.
 
 Folgendes bitte ändern:
+1.  die Konstanten NEW_CONNECTION, LOADING_NODE, ... in den View-Klassen bitte in eine eigene "AppConstants.java§ Klasse auslagern und als publich static declarieren, damit sie von allen View-Klassen verwendet werden können.
 1.  die GUI soll als Konfig nur die Datien mit Namen-Pattern "*-config.properties" auflisten bzw. laden
-2.  DB-Viewer: beim Selektieren von "Neue Verbindung" soll die alte DB-Verbindung geschlossen werden.
-3.  Beim Wechseln der Config, werden nur die Flags aus der selektierten config-Datei gelesen bzw. gespeichert. Die Combo-Werte aber nicht
-4. Die Views sollten als Konstruktor-Parameter die aktuelle Konfiguration bekommen, damit sie der Konfigration entsprechende Operationen durchführen können
-
+2.  DB-Viewer: der Combobox für vorhandene DB-Verbindungen zeigt unterschiedliche DB-Vebindungen, je nachdem welche Config (ene-config.properties oder gee-config.properties) selektiertt ist
+3.  Beim Wechseln der Config wird die DB-Verbindung, die man zugewiesen hatte, nicht gespeichert
+4.  ITSQ-Explorer: Beim load-Button wird auf das target-Verzeichnis gewechselt.

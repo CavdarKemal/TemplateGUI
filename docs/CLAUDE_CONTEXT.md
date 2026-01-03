@@ -5,7 +5,7 @@
 **Pfad:** `E:\Projekte\ClaudeCode\TemplateGUI`
 **Typ:** Java Swing MDI-Anwendung (Multi-Document Interface)
 **Build:** Maven, Java 17
-**Package:** `de.template.gui`
+**Package:** `de.de.cavdar.gui`
 **Ziel:** Template-Projekt das Funktionalitaeten aus StandardMDIGUI und ITSQ-Test vereint
 
 ## Quellprojekte
@@ -52,7 +52,7 @@ TemplateGUI/
     ├── assembly/
     │   └── distribution.xml    # Assembly Deskriptor
     └── main/
-        ├── java/de/template/gui/
+        ├── java/de/de.cavdar/gui/
         │   ├── design/         # GUI Panels (Layout)
         │   ├── view/           # Views (Logik)
         │   ├── model/          # Datenmodelle
@@ -65,7 +65,7 @@ TemplateGUI/
 ## Package-Struktur
 
 ```
-de.template.gui/
+de.de.cavdar.gui/
 ├── design/                     # GUI-Panels (fuer GUI-Designer)
 │   ├── BaseViewPanel.java      # Abstract Basis fuer View-Panels
 │   ├── MainFrame.java          # Hauptfenster mit MDI

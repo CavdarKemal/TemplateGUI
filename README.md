@@ -79,7 +79,7 @@ TemplateGUI/
     ├── assembly/
     │   └── distribution.xml    # Assembly Deskriptor
     └── main/
-        ├── java/de/template/gui/
+        ├── java/de/cavdar/gui/
         │   ├── design/         # GUI Panels (Layout)
         │   ├── view/           # Views (Logik)
         │   ├── model/          # Datenmodelle
@@ -93,11 +93,11 @@ TemplateGUI/
 
 | Package | Beschreibung |
 |---------|--------------|
-| `de.template.gui.design` | GUI-Komponenten (Panels, Frames) |
-| `de.template.gui.view` | View-Logik und Event-Handler |
-| `de.template.gui.model` | Datenmodelle (AppConfig, ConnectionInfo, etc.) |
-| `de.template.gui.util` | Utilities (ConnectionManager, TestDataLoader, etc.) |
-| `de.template.gui.exception` | Exceptions |
+| `de.cavdar.gui.design` | GUI-Komponenten (Panels, Frames) |
+| `de.cavdar.gui.view` | View-Logik und Event-Handler |
+| `de.cavdar.gui.model` | Datenmodelle (AppConfig, ConnectionInfo, etc.) |
+| `de.cavdar.gui.util` | Utilities (ConnectionManager, TestDataLoader, etc.) |
+| `de.cavdar.gui.exception` | Exceptions |
 
 ## Architektur
 
