@@ -3,6 +3,8 @@ package de.cavdar.gui.view;
 import de.cavdar.gui.design.BaseViewPanel;
 import de.cavdar.gui.design.ItsqTreeViewPanel;
 import de.cavdar.gui.model.AppConfig;
+
+import static de.cavdar.gui.util.AppConstants.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +47,6 @@ import java.util.Comparator;
  */
 public class ItsqTreeView extends BaseView {
     private static final Logger LOG = LoggerFactory.getLogger(ItsqTreeView.class);
-    private static final String ITSQ_PATH_KEY = "ITSQ_PATH";
-    private static final String DEFAULT_ITSQ_PATH = "ITSQ";
 
     private ItsqTreeViewPanel itsqPanel;
     private final AppConfig cfg = AppConfig.getInstance();

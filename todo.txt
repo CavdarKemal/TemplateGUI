@@ -5,4 +5,3 @@ Folgendes bitte ändern:
 1.  die GUI soll als Konfig nur die Datien mit Namen-Pattern "*-config.properties" auflisten bzw. laden
 2.  DB-Viewer: der Combobox für vorhandene DB-Verbindungen zeigt unterschiedliche DB-Vebindungen, je nachdem welche Config (ene-config.properties oder gee-config.properties) selektiertt ist
 3.  Beim Wechseln der Config wird die DB-Verbindung, die man zugewiesen hatte, nicht gespeichert
-4.  ITSQ-Explorer: Beim load-Button wird auf das target-Verzeichnis gewechselt.

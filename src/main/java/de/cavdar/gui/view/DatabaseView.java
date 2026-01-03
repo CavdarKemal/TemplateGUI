@@ -4,7 +4,10 @@ import de.cavdar.gui.design.BaseViewPanel;
 import de.cavdar.gui.design.DatabaseViewPanel;
 import de.cavdar.gui.model.AppConfig;
 import de.cavdar.gui.model.ConnectionInfo;
+import de.cavdar.gui.util.AppConstants;
 import de.cavdar.gui.util.ConnectionManager;
+
+import static de.cavdar.gui.util.AppConstants.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +42,7 @@ import java.util.Vector;
  */
 public class DatabaseView extends BaseView implements ConnectionManager.ConnectionListener {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseView.class);
-    private static final String NEW_CONNECTION = "<Neue Verbindung>";
-    private static final String LOADING_NODE = "Laden...";
-    private static final String FAVORITE_PREFIX = "★ ";
     private static final int MAX_HISTORY_SIZE = 20;
-    private static final String SQL_HISTORY_KEY = "SQL_HISTORY";
-    private static final String SQL_FAVORITES_KEY = "SQL_FAVORITES";
-    private static final String SQL_SEPARATOR = ";;";
 
     private DatabaseViewPanel dbPanel;
     private Connection connection;

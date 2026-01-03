@@ -456,7 +456,44 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         return false;
     }
 
+    /**
+     * Saves current UI settings to the active config file.
+     * Called before switching to a different config file.
+     */
+    private void saveCurrentSettings() {
+        LOG.info("Saving current settings before config switch");
+
+        // Save DB connection selection
+        String dbConnection = (String) cbDbConnections.getSelectedItem();
+        if (dbConnection != null) {
+            ConnectionManager.setLastConnectionName(dbConnection);
+        }
+
+        // Save ComboBox selections
+        if (cbSources.getSelectedItem() != null) {
+            cfg.setProperty("LAST_TEST_SOURCE", (String) cbSources.getSelectedItem());
+        }
+        if (cbTypes.getSelectedItem() != null) {
+            cfg.setProperty("LAST_TEST_TYPE", (String) cbTypes.getSelectedItem());
+        }
+        if (cbRevisions.getSelectedItem() != null) {
+            cfg.setProperty("LAST_ITSQ_REVISION", (String) cbRevisions.getSelectedItem());
+        }
+
+        // Save checkbox states
+        cfg.setProperty("DUMP_IN_REST_CLIENT", String.valueOf(chkDump.isSelected()));
+        cfg.setProperty("SFTP_UPLOAD_ACTIVE", String.valueOf(chkSftpUpload.isSelected()));
+        cfg.setProperty("CHECK-EXPORT-PROTOKOLL-ACTIVE", String.valueOf(chkExportProtokoll.isSelected()));
+        cfg.setProperty("LAST_UPLOAD_SYNTHETICS", String.valueOf(chkUploadSynthetics.isSelected()));
+        cfg.setProperty("LAST_USE_ONLY_TEST_CLZ", String.valueOf(chkOnlyTestClz.isSelected()));
+
+        cfg.save();
+    }
+
     private void loadSelectedConfig(String configName) {
+        // Save current settings to OLD config before switching
+        saveCurrentSettings();
+
         File configFile = new File(configDirectory, configName);
         LOG.info("Loading configuration: {}", configFile.getAbsolutePath());
 

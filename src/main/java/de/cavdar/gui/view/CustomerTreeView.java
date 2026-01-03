@@ -10,6 +10,8 @@ import de.cavdar.gui.util.CheckboxTreeCellEditor;
 import de.cavdar.gui.util.CheckboxTreeCellRenderer;
 import de.cavdar.gui.util.IconLoader;
 import de.cavdar.gui.util.TestDataLoader;
+
+import static de.cavdar.gui.util.AppConstants.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +41,6 @@ import java.util.List;
  */
 public class CustomerTreeView extends TreeView {
     private static final Logger LOG = LoggerFactory.getLogger(CustomerTreeView.class);
-    private static final String LAST_LOAD_DIRECTORY_KEY = "LAST_LOAD_DIRECTORY";
-    private static final String LOAD_DIRECTORIES_KEY = "LOAD_DIRECTORIES";
-    private static final String FILE_HISTORY_KEY = "CUSTOMER_FILE_HISTORY";
-    private static final String DIRECTORY_SEPARATOR = ";";
     private static final int MAX_DIRECTORY_HISTORY = 10;
     private static final int MAX_FILE_HISTORY = 15;
 
