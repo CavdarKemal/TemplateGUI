@@ -1,0 +1,142 @@
+JFDML JFormDesigner: "8.3" encoding: "UTF-8"
+
+new FormModel {
+	"i18n.autoExternalize": true
+	"i18n.bundlePackage": "de.cavdar.gui.design"
+	"i18n.bundleName": "form"
+	"i18n.keyPrefix": "CustomerTreeViewPanel"
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			name: "this"
+			auxiliary() {
+				"JavaCodeGenerator.variableGetter": true
+			}
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0, 0:1.0, 0:1.0, 0:1.0"
+				"$rowSpecs": "0:1.0, 0, 0, 0"
+				"$hGap": 2
+				"$vGap": 2
+				"$alignTop": true
+				"$alignLeft": true
+			} ) {
+				name: "panelControls"
+				"border": &EtchedBorder0 new javax.swing.border.EtchedBorder( 1, null, null )
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "labelConfig"
+					"text": "Config:"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JComboBox" ) {
+					name: "comboBoxConfig"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridwidth": 3
+					"gridx": 1
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonLoad"
+					"text": "Load"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/folder_gear.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+					"gridx": 1
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonSave"
+					"text": "Save"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/save.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 2
+					"gridy": 1
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonRefresh"
+					"text": "Refrsh"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/refresh.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 3
+					"gridy": 1
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "labelFilter"
+					"text": "Filter:"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 2
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+				add( new FormComponent( "javax.swing.JComboBox" ) {
+					name: "comboBoxFilter"
+					"editable": true
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 1
+					"gridy": 2
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+					"gridwidth": 2
+				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "checkBoxActiveOnly"
+					"text": "Active Only"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 3
+					"gridy": 2
+					"insets": new java.awt.Insets( 2, 2, 2, 2 )
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "North"
+			} )
+			add( new FormContainer( "javax.swing.JSplitPane", new FormLayoutManager( class javax.swing.JSplitPane ) ) {
+				name: "splitPaneItsq"
+				"dividerLocation": 120
+				add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqPanelTree" ) {
+					name: "panelItsqTree"
+					"border": #EtchedBorder0
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "left"
+				} )
+				add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqViewTabView" ) {
+					name: "panelItsqView"
+					"border": #EtchedBorder0
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "right"
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 855, 455 )
+		} )
+	}
+}

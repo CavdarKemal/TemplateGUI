@@ -1,0 +1,56 @@
+JFDML JFormDesigner: "8.3" encoding: "UTF-8"
+
+new FormModel {
+	"i18n.autoExternalize": true
+	"i18n.bundlePackage": "de.cavdar.gui.design"
+	"i18n.bundleName": "form"
+	"i18n.keyPrefix": "ITSQViewPanel"
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.CardLayout ) ) {
+			name: "this"
+			"border": new javax.swing.border.EtchedBorder( 1, null, null )
+			auxiliary() {
+				"JavaCodeGenerator.variableGetter": true
+			}
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqRootView" ) {
+				name: "panelRoot"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "card7"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqArchivBestandView" ) {
+				name: "panelArchivBestand"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardArchivBestand"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqArchibBestandPhaseView" ) {
+				name: "panelArchivBestandPhase"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardArchivBestandPhase"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqRefExportsView" ) {
+				name: "panelRefExports"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardRefExports"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqRefExportsPhaseView" ) {
+				name: "panelRefExportsPhase"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardRefExportsPhase"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqCustomerView" ) {
+				name: "panelCustomer"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardCustomer"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqScenarioView" ) {
+				name: "panelScenario"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardScenario"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 505, 300 )
+		} )
+	}
+}

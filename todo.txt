@@ -1,7 +1,20 @@
-Folgendes habe ich geändert: Package wieder auf de.cavdar refactored.
+Im package de.cavdar.gui.jfd.design habe ich die GUI-Klassen, die ich mit JFormDesigner erstellt habe
+Im package de.cavdar.gui.jfd.view habe ich die View-Klassen, die jeweils Klassen aus dem design-Package erben
 
-Folgendes bitte ändern:
-1.  die Konstanten NEW_CONNECTION, LOADING_NODE, ... in den View-Klassen bitte in eine eigene "AppConstants.java§ Klasse auslagern und als publich static declarieren, damit sie von allen View-Klassen verwendet werden können.
-1.  die GUI soll als Konfig nur die Datien mit Namen-Pattern "*-config.properties" auflisten bzw. laden
-2.  DB-Viewer: der Combobox für vorhandene DB-Verbindungen zeigt unterschiedliche DB-Vebindungen, je nachdem welche Config (ene-config.properties oder gee-config.properties) selektiertt ist
-3.  Beim Wechseln der Config wird die DB-Verbindung, die man zugewiesen hatte, nicht gespeichert
+Im Projekt-Ordner ist ein Bild aus dem JFormDesigner für das Panel ItsqMainPanel.jfd
+
+Neu:
+ITSQ-Explorer soll die GUI unter jfd-Package benutzen. Dabei soll der Tree aus dem ITSQ-Verzeichnis initialisert werden (wie bisher)
+Zusatz: Je nach selektiertem Tree-Item soll in der rechten View (Card-Layout) die passend View dargestellt werden:
+  z.B: ITSQ -> ItsqRootView
+        ARCHIV-BESTAND -> ItsqArchivBestandView
+        ARCHIV-BESTAND/PHASE-1 -> ItsqArchibBestandPhaseView
+        ARCHIV-BESTAND/PHASE-2 -> ItsqArchibBestandPhaseView
+        REF-EXPORTS -> ItsqRefExportsView
+        REF-EXPORTS/PHASE-1 -> ItsqRefExportsPhaseView
+        REF-EXPORTS/PHASE-2 -> ItsqRefExportsPhaseView
+        REF-EXPORTS/PHASE-x/Relevanx-xyz -> ItsqScenarioView
+        REF-EXPORTS/PHASE-x/Relevanx-xyz/c0x -> ItsqCustomerView
+
+
+
