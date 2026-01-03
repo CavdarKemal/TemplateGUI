@@ -329,7 +329,7 @@ private void processData() {
 
 ### Aus IDE (IntelliJ)
 
-Main-Klasse: `view.de.cavdar.gui.MainView`
+Main-Klasse: `de.cavdar.gui.view.MainView`
 
 ### Aus Distribution
 

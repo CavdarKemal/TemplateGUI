@@ -40,7 +40,7 @@ startGUI.cmd
 ### Linux/macOS
 ```bash
 cd target/TemplateGUI-1.0.0-SNAPSHOT
-java -cp "lib/*" view.de.cavdar.gui.MainView
+java -cp "lib/*" de.cavdar.gui.view.MainView
 ```
 
 ## Docker

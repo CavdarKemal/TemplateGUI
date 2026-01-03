@@ -34,4 +34,4 @@ WORKDIR /app/TemplateGUI
 ENV DISPLAY=:0
 
 # Run the application
-CMD ["java", "-cp", "lib/*", "view.de.cavdar.gui.MainView"]
+CMD ["java", "-cp", "lib/*", "de.cavdar.gui.view.MainView"]
