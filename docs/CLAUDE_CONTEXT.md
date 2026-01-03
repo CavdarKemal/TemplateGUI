@@ -5,7 +5,7 @@
 **Pfad:** `E:\Projekte\ClaudeCode\TemplateGUI`
 **Typ:** Java Swing MDI-Anwendung (Multi-Document Interface)
 **Build:** Maven, Java 17
-**Package:** `de.de.cavdar.gui`
+**Package:** `de.cavdar.gui`
 **Ziel:** Template-Projekt das Funktionalitaeten aus StandardMDIGUI und ITSQ-Test vereint
 
 ## Quellprojekte
@@ -21,13 +21,23 @@
 
 ## Letzte Aenderungen
 
+**04.01.2026** - JFormDesigner Integration:
+- **Neues Package `de.cavdar.gui.jfd`**: GUI-Klassen aus JFormDesigner
+  - `jfd/design/`: JFormDesigner-generierte Panels (ItsqMainPanel, ItsqTreePanel, etc.)
+  - `jfd/view/`: View-Klassen die design-Klassen erweitern
+- **ItsqExplorerView**: Neue View mit JFD-GUI und CardLayout-Switching
+  - Tree-Selektion wechselt automatisch die Detail-View (CardLayout)
+  - Mapping: ITSQ->Root, ARCHIV-BESTAND->ArchivBestand, REF-EXPORTS->RefExports, etc.
+- **ResourceBundle**: `de/cavdar/gui/design/form.properties` fuer JFD-Panels
+- **AppConstants.java**: Zentrale Konstanten (NEW_CONNECTION, LOADING_NODE, etc.)
+
 **03.01.2026** - UI-Refactoring und Bugfixes:
 - **Dual-Toolbar Layout**: Config-Toolbar (Einstellungen) + View-Toolbar (View-Buttons)
 - **Kein linkes Split-Panel mehr**: Vereinfachtes Layout
 - **ItsqTreeView**: Neue View zum Browsen des eingebetteten ITSQ-Verzeichnisses
 - **Config-Filter**: Nur `*-config.properties` Dateien werden geladen
 - **isReloading-Flag**: Verhindert unbeabsichtigtes Speichern beim Config-Wechsel
-- **BaseView.config**: AppConfig-Feld in BaseView fuer alle Subklassen verfuegbar
+- **saveCurrentSettings()**: Speichert alle UI-Einstellungen vor Config-Wechsel
 
 ## Projektstruktur
 
@@ -52,20 +62,25 @@ TemplateGUI/
     ├── assembly/
     │   └── distribution.xml    # Assembly Deskriptor
     └── main/
-        ├── java/de/de.cavdar/gui/
+        ├── java/de/cavdar/gui/
         │   ├── design/         # GUI Panels (Layout)
         │   ├── view/           # Views (Logik)
         │   ├── model/          # Datenmodelle
         │   ├── util/           # Utilities
-        │   └── exception/      # Exceptions
+        │   ├── exception/      # Exceptions
+        │   └── jfd/            # JFormDesigner Klassen (NEU)
+        │       ├── design/     # JFD-generierte Panels
+        │       └── view/       # View-Klassen fuer JFD
         └── resources/
-            └── icons/          # 38 PNG-Icons
+            ├── icons/          # 38 PNG-Icons
+            └── de/cavdar/gui/design/
+                └── form.properties  # ResourceBundle fuer JFD
 ```
 
 ## Package-Struktur
 
 ```
-de.de.cavdar.gui/
+de.cavdar.gui/
 ├── design/                     # GUI-Panels (fuer GUI-Designer)
 │   ├── BaseViewPanel.java      # Abstract Basis fuer View-Panels
 │   ├── MainFrame.java          # Hauptfenster mit MDI
@@ -107,9 +122,34 @@ de.de.cavdar.gui/
 │   ├── CheckboxTreeCellRenderer.java
 │   └── CheckboxTreeCellEditor.java
 │
-└── exception/
-    ├── ConfigurationException.java
-    └── ViewException.java
+├── exception/
+│   ├── ConfigurationException.java
+│   └── ViewException.java
+│
+└── jfd/                        # JFormDesigner Klassen (NEU)
+    ├── design/                 # JFD-generierte Panels
+    │   ├── ItsqMainPanel.java      # Hauptpanel mit SplitPane
+    │   ├── ItsqTreePanel.java      # Tree-Panel (links)
+    │   ├── ItsqViewTabPanel.java   # CardLayout (rechts)
+    │   ├── ItsqRootPanel.java
+    │   ├── ItsqArchivBestandPanel.java
+    │   ├── ItsqArchivBestandPhasePanel.java
+    │   ├── ItsqRefExportsPanel.java
+    │   ├── ItsqRefExportsPhasePanel.java
+    │   ├── ItsqCustomerPanel.java
+    │   └── ItsqScenarioPanel.java
+    │
+    └── view/                   # View-Klassen
+        ├── ItsqExplorerView.java   # Hauptview (extends BaseView)
+        ├── ItsqPanelTree.java      # extends ItsqTreePanel
+        ├── ItsqViewTabView.java    # extends ItsqViewTabPanel
+        ├── ItsqRootView.java
+        ├── ItsqArchivBestandView.java
+        ├── ItsqArchibBestandPhaseView.java
+        ├── ItsqRefExportsView.java
+        ├── ItsqRefExportsPhaseView.java
+        ├── ItsqCustomerView.java
+        └── ItsqScenarioView.java
 ```
 
 ## Design-View-Trennung Pattern
@@ -154,7 +194,8 @@ public interface ViewInfo {
 | TreeView | Ctrl+4 | Navigation | folder_view.png |
 | CustomerTreeView | Ctrl+5 | Verwaltung | folder_cubes.png |
 | EditorView | Ctrl+E | Views | folder_edit.png |
-| ItsqTreeView | Ctrl+I | Navigation | folder_cubes.png |
+| ItsqTreeView | Ctrl+I | Verwaltung | folder_cubes.png |
+| ItsqExplorerView | Ctrl+J | Verwaltung | folder_cubes.png |
 
 ## Maven-Artefakt-Integration
 
@@ -250,9 +291,23 @@ docker-compose up -d postgres
 - **Maven:** 3.6+
 - **Docker:** Optional fuer PostgreSQL
 
+## Offene Punkte (Stand 04.01.2026)
+
+Die ItsqExplorerView (JFormDesigner-basiert) laeuft, aber es gibt noch Kleinigkeiten:
+- TODO: Konkrete Issues vom Benutzer abwarten und beheben
+- Die JFD View-Klassen (ItsqRootView, ItsqArchivBestandView, etc.) sind noch leer (nur Konstruktor)
+- Diese koennen mit Logik befuellt werden wenn Details bekannt sind
+
 ## Prompt zum Fortsetzen
 
 ```
 Ich arbeite am Java-Projekt TemplateGUI unter E:\Projekte\ClaudeCode\TemplateGUI.
 Bitte lies die Datei docs/CLAUDE_CONTEXT.md fuer den Kontext.
+
+Stand: ItsqExplorerView mit JFormDesigner GUI ist implementiert.
+- Tree wird aus ITSQ-Verzeichnis geladen
+- CardLayout wechselt basierend auf Tree-Selektion
+- Es gibt noch Kleinigkeiten zu fixen
+
+Bitte lies todo.txt fuer aktuelle Aufgaben.
 ```
