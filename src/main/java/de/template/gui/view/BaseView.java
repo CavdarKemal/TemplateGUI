@@ -1,6 +1,7 @@
 package de.template.gui.view;
 
 import de.template.gui.design.BaseViewPanel;
+import de.template.gui.model.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,9 @@ import javax.swing.*;
  */
 public abstract class BaseView extends JInternalFrame implements ViewInfo {
     private static final Logger LOG = LoggerFactory.getLogger(BaseView.class);
+
+    /** Application configuration - available to all subclasses */
+    protected final AppConfig config = AppConfig.getInstance();
 
     protected BaseViewPanel panel;
     protected SwingWorker<Void, Void> currentWorker;
@@ -148,6 +152,16 @@ public abstract class BaseView extends JInternalFrame implements ViewInfo {
      */
     public JPanel getContentPanel() {
         return panel.getContentPanel();
+    }
+
+    /**
+     * Returns the application configuration.
+     * Use this to access config properties in subclasses.
+     *
+     * @return the AppConfig instance
+     */
+    public AppConfig getConfig() {
+        return config;
     }
 
     // ===== ViewInfo Default Implementation =====

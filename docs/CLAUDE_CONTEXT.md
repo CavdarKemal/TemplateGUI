@@ -19,6 +19,16 @@
 
 **03.01.2026** - Initiale Erstellung durch Zusammenfuehrung der Quellprojekte
 
+## Letzte Aenderungen
+
+**03.01.2026** - UI-Refactoring und Bugfixes:
+- **Dual-Toolbar Layout**: Config-Toolbar (Einstellungen) + View-Toolbar (View-Buttons)
+- **Kein linkes Split-Panel mehr**: Vereinfachtes Layout
+- **ItsqTreeView**: Neue View zum Browsen des eingebetteten ITSQ-Verzeichnisses
+- **Config-Filter**: Nur `*-config.properties` Dateien werden geladen
+- **isReloading-Flag**: Verhindert unbeabsichtigtes Speichern beim Config-Wechsel
+- **BaseView.config**: AppConfig-Feld in BaseView fuer alle Subklassen verfuegbar
+
 ## Projektstruktur
 
 ```
@@ -71,10 +81,11 @@ de.template.gui/
 │
 ├── view/                       # View-Logik
 │   ├── ViewInfo.java           # Interface fuer View-Metadaten
-│   ├── BaseView.java           # Abstract, implementiert ViewInfo
+│   ├── BaseView.java           # Abstract, implementiert ViewInfo, hat config-Feld
 │   ├── MainView.java           # Einstiegspunkt mit main()
 │   ├── DatabaseView.java       # DB-Verbindungen, SQL-Ausfuehrung
-│   ├── CustomerTreeView.java   # Checkbox-Tree fuer Kunden
+│   ├── CustomerTreeView.java   # Checkbox-Tree fuer Kunden (JSON-Dateien)
+│   ├── ItsqTreeView.java       # Tree-View fuer ITSQ-Verzeichnis (Assembly)
 │   ├── EditorView.java         # Text-Editor
 │   ├── SampleView.java
 │   ├── ProzessView.java
@@ -143,6 +154,7 @@ public interface ViewInfo {
 | TreeView | Ctrl+4 | Navigation | folder_view.png |
 | CustomerTreeView | Ctrl+5 | Verwaltung | folder_cubes.png |
 | EditorView | Ctrl+E | Views | folder_edit.png |
+| ItsqTreeView | Ctrl+I | Navigation | folder_cubes.png |
 
 ## Maven-Artefakt-Integration
 

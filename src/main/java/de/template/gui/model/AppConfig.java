@@ -15,7 +15,7 @@ import java.util.Properties;
 
 /**
  * Singleton configuration manager for the MDI application.
- * Manages properties from the config.properties file with support for
+ * Manages properties from the ene-config.properties file with support for
  * various data types (String, Array, Boolean, int).
  *
  * <p>This implementation uses eager initialization for thread-safety.</p>
@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 public class AppConfig {
     private static final Logger LOG = LoggerFactory.getLogger(AppConfig.class);
-    private static final String DEFAULT_FILE_PATH = "config.properties";
+    private static final String DEFAULT_FILE_PATH = "ene-config.properties";
     private static final String INITIAL_FILE_PATH;
     private static final AppConfig INSTANCE;
 

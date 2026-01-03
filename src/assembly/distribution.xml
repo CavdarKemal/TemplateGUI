@@ -17,7 +17,7 @@
             <directory>${project.basedir}/delivery</directory>
             <includes>
                 <include>log4j.properties</include>
-                <include>config.properties</include>
+                <include>*-config.properties</include>
                 <include>startGUI.cmd</include>
                 <include>startGUI.sh</include>
             </includes>

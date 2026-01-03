@@ -148,6 +148,11 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
     private void onConnectionSelected() {
         String selected = (String) dbPanel.getConnectionsComboBox().getSelectedItem();
         if (selected == null || selected.equals(NEW_CONNECTION)) {
+            // Close existing connection when selecting "Neue Verbindung"
+            if (connection != null) {
+                disconnect();
+                LOG.info("Closed existing connection for new connection setup");
+            }
             // Clear fields for new connection
             dbPanel.getConnectionNameField().setText("");
             dbPanel.getConnectionNameField().setEditable(true);

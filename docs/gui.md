@@ -1,8 +1,8 @@
-# ITSQ-Test GUI Dokumentation
+# TemplateGUI Dokumentation
 
 ## Übersicht
 
-Die ITSQ-Test GUI ist eine Java Swing MDI-Anwendung (Multiple Document Interface) mit strikter **Design-View-Trennung**. Das Architekturkonzept basiert auf dem StandardMDIGUI-Framework.
+Die TemplateGUI ist eine Java Swing MDI-Anwendung (Multiple Document Interface) mit strikter **Design-View-Trennung**. Das Architekturkonzept basiert auf dem StandardMDIGUI-Framework.
 
 ## Architektur-Prinzipien
 
@@ -52,25 +52,29 @@ Die ITSQ-Test GUI ist eine Java Swing MDI-Anwendung (Multiple Document Interface
 ## Package-Struktur
 
 ```
-de.cavdar.gui
+de.template.gui
 ├── design/                          # GUI-Komponenten
 │   ├── BaseViewPanel.java           # Basis-Panel mit Toolbar/Status
-│   ├── TreeViewPanel.java           # Wrapper fuer InternalFrameTreeView
-│   ├── EditorPanel.java             # Wrapper fuer InternalFrameEditor
+│   ├── MainFrame.java               # Hauptfenster mit Dual-Toolbar Layout
+│   ├── DesktopPanel.java            # MDI-Desktop fuer Views
 │   ├── DatabaseViewPanel.java       # Panel fuer Datenbank-View
-│   ├── SettingsPanel.java           # Einstellungen-Panel (links)
-│   ├── EmbeddablePanel.java         # Basis fuer eingebettete Panels
-│   ├── InternalFrameTreeView.java   # JFormDesigner-generiert
+│   ├── CustomerTreeViewPanel.java   # Panel fuer Kunden-Tree
+│   ├── ItsqTreeViewPanel.java       # Panel fuer ITSQ-Tree
+│   ├── EditorPanel.java             # Wrapper fuer Editor
 │   ├── InternalFrameEditor.java     # JFormDesigner-generiert
-│   └── MainFrame.java               # JFormDesigner-generiert
+│   └── ...ViewPanel.java            # Weitere View-Panels
 │
 ├── model/                           # Datenmodelle
 │   ├── AppConfig.java               # Singleton Konfigurationsverwaltung
 │   ├── ConfigEntry.java             # Typ-sicherer Konfigurations-Eintrag
-│   └── ConnectionInfo.java          # Datenbank-Verbindungsinfo
+│   ├── ConnectionInfo.java          # Datenbank-Verbindungsinfo
+│   ├── TestCustomer.java            # Kunde mit Szenarien
+│   ├── TestScenario.java            # Szenario mit Testfaellen
+│   └── TestCrefo.java               # Testfall
 │
 ├── util/                            # Utility-Klassen
 │   ├── ConnectionManager.java       # Verbindungsverwaltung
+│   ├── TestDataLoader.java          # JSON Laden/Speichern
 │   └── IconLoader.java              # Icon-Laden aus Resources
 │
 ├── exception/                       # Exceptions
@@ -78,11 +82,13 @@ de.cavdar.gui
 │
 └── view/                            # Business-Logik
     ├── ViewInfo.java                # Interface fuer View-Metadaten
-    ├── BaseView.java                # Abstrakte View-Basisklasse
-    ├── TreeViewView.java            # TreeView mit Logik
-    ├── EditorView.java              # Editor mit Logik
+    ├── BaseView.java                # Abstrakte View-Basisklasse (mit config-Feld)
+    ├── MainView.java                # Einstiegspunkt mit main()
     ├── DatabaseView.java            # Datenbank-View mit SQL-Editor
-    └── MainView.java                # Hauptanwendung, MDI-Management
+    ├── CustomerTreeView.java        # Checkbox-Tree fuer Kunden (JSON)
+    ├── ItsqTreeView.java            # Tree fuer ITSQ-Verzeichnis
+    ├── EditorView.java              # Text-Editor
+    └── ...View.java                 # Weitere Views
 ```
 
 ## Klassen-Dokumentation
@@ -156,7 +162,7 @@ Erstellen Sie ein neues Panel in JFormDesigner (z.B. `InternalFrameMyView.java`)
 ### Schritt 2: Panel-Wrapper erstellen
 
 ```java
-package de.cavdar.gui.design;
+package de.template.gui.design;
 
 public class MyViewPanel extends BaseViewPanel {
     private InternalFrameMyView myView;
@@ -192,7 +198,7 @@ public class MyViewPanel extends BaseViewPanel {
 ### Schritt 3: View-Klasse erstellen
 
 ```java
-package de.cavdar.gui.view;
+package de.template.gui.view;
 
 public class MyViewView extends BaseView {
     private MyViewPanel myPanel;
@@ -319,12 +325,12 @@ private void processData() {
 
 ### Aus IDE (IntelliJ)
 
-Main-Klasse: `de.cavdar.gui.view.MainView`
+Main-Klasse: `de.template.gui.view.MainView`
 
 ### Aus Distribution
 
 ```cmd
-cd C:\Temp\ITSQ-Test-1.1.0-SNAPSHOT
+cd target\TemplateGUI-1.0.0-SNAPSHOT
 startGUI.cmd
 ```
 
@@ -449,7 +455,7 @@ Die DatabaseView bietet einen vollstaendigen SQL-Client mit:
 ### SQL-History und Favoriten
 
 ```properties
-# In config.properties gespeichert:
+# In ene-config.properties gespeichert:
 SQL_HISTORY=SELECT * FROM users;;SELECT COUNT(*) FROM orders
 SQL_FAVORITES=SELECT * FROM products WHERE active=true
 ```
@@ -479,26 +485,44 @@ Das Panel reagiert automatisch auf Aenderungen der Verbindungsliste (Observer Pa
 ## Anwendungslayout
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  Toolbar                                                         │
-├─────────────┬───────────────────────────────────────────────────┤
-│             │                                                    │
-│  Settings   │          JDesktopPane                             │
-│   Panel     │   ┌─────────────────────────────────┐             │
-│             │   │ TreeView                         │             │
-│ DB-Verbind. │   │                                 │             │
-│ [Combo][DB] │   └─────────────────────────────────┘             │
-│             │   ┌─────────────────────────────────┐             │
-│ Kunde       │   │ DatabaseView                    │             │
-│ [Combo    ] │   │                                 │             │
-│             │   └─────────────────────────────────┘             │
-│ Std-Treiber │                                                    │
-│ [TextField] │                                                    │
-│             │                                                    │
-├─────────────┴───────────────────────────────────────────────────┤
-│  Status                                                          │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Config-Toolbar                                                              │
+│  [Config▼][↻] [DB▼][🗄] [Source▼] [Type▼] [Rev▼] ☐Dump ☐SFTP ☐Export...     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  View-Toolbar                                                                │
+│  [Views:] [Sample] [Prozess] [Analyse] [Tree] [Customer] [Editor] [ITSQ]    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│                         JDesktopPane                                         │
+│                                                                              │
+│      ┌─────────────────────────────┐   ┌─────────────────────────────┐      │
+│      │ CustomerTreeView            │   │ DatabaseView                │      │
+│      │  📁 Kunden                  │   │  [SQL-Editor]               │      │
+│      │   └─📁 Szenarien           │   │  [Ergebnis-Tabelle]         │      │
+│      │      └─📄 Testfaelle       │   │                             │      │
+│      └─────────────────────────────┘   └─────────────────────────────┘      │
+│                                                                              │
+│      ┌─────────────────────────────┐                                        │
+│      │ ItsqTreeView                │                                        │
+│      │  📁 ITSQ                    │                                        │
+│      │   └─📁 ARCHIV-BESTAND      │                                        │
+│      │   └─📁 REF-EXPORTS         │                                        │
+│      └─────────────────────────────┘                                        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### Dual-Toolbar Konzept
+
+**Config-Toolbar** (obere Zeile):
+- Konfigurationsdatei-Auswahl (`*-config.properties`)
+- DB-Verbindungs-Auswahl
+- Testquellen, Testtypen, ITSQ-Revisionen
+- Feature-Flags (Checkboxen)
+
+**View-Toolbar** (zweite Zeile):
+- Buttons zum Oeffnen der registrierten Views
+- Dynamisch basierend auf `registerView()` Aufrufen
 
 ## Konfigurationsdatei (config.properties)
 

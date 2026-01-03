@@ -1,1 +1,13 @@
-Eine zweite CustomerTreeView-Variante, die den Tree mit Elementen aus dem eingebetteten ITSQ-Verzeichnis füllt (testfaelle:test_set).
+Folgendes habe ich geändert:
+1. das Verzeichnis "TemplateGUI\delivery" aufgeräumt:
+    - Konfigurationsdatei config.properties umbenannt in ene.config.properties
+    - startGUI überarbeitet
+2. das Verzeichnis "TemplateGUI\docker\config" aufgeräumt
+3. die Datei src/assembly/distribution.xml überarbeitet
+
+Folgendes bitte ändern:
+1.  die GUI soll als Konfig nur die Datien mit Namen-Pattern "*-config.properties" auflisten bzw. laden
+2.  DB-Viewer: beim Selektieren von "Neue Verbindung" soll die alte DB-Verbindung geschlossen werden.
+3.  Beim Wechseln der Config, werden nur die Flags aus der selektierten config-Datei gelesen bzw. gespeichert. Die Combo-Werte aber nicht
+4. Die Views sollten als Konstruktor-Parameter die aktuelle Konfiguration bekommen, damit sie der Konfigration entsprechende Operationen durchführen können
+
