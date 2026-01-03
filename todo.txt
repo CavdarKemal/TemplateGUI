@@ -1,0 +1,1 @@
+Eine zweite CustomerTreeView-Variante, die den Tree mit Elementen aus dem eingebetteten ITSQ-Verzeichnis füllt (testfaelle:test_set).

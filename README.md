@@ -40,7 +40,7 @@ startGUI.cmd
 ### Linux/macOS
 ```bash
 cd target/TemplateGUI-1.0.0-SNAPSHOT
-java -cp "lib/*" de.template.gui.design.MainFrame
+java -cp "lib/*" de.template.gui.view.MainView
 ```
 
 ## Docker
@@ -71,6 +71,8 @@ TemplateGUI/
 │   ├── log4j.properties        # Logging-Konfiguration
 │   └── startGUI.cmd            # Windows Startskript
 ├── docs/
+│   ├── CLAUDE_CONTEXT.md       # Projekt-Kontext fuer Claude
+│   ├── DOCKER_GUIDE.md         # Docker-Anleitung
 │   ├── gui.md                  # GUI-Architektur
 │   └── Maven-Artefakt-Integration.md
 └── src/
@@ -120,6 +122,52 @@ BaseViewPanel (abstrakt)
 Dieses Template vereint Funktionalitaeten aus:
 - **StandardMDIGUI**: MDI-Framework, Views, Design-Pattern
 - **ITSQ-Test**: Maven-Artefakt-Integration, Assembly, Dokumentation
+
+## Dokumentation
+
+| Dokument | Beschreibung |
+|----------|--------------|
+| [CLAUDE_CONTEXT.md](docs/CLAUDE_CONTEXT.md) | Projekt-Kontext fuer Claude Code Sessions |
+| [DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md) | Docker-Anleitung fuer Java-Projekte mit PostgreSQL |
+| [Maven-Artefakt-Integration.md](docs/Maven-Artefakt-Integration.md) | Artefakte aus einem Maven-Projekt in ein anderes integrieren |
+| [gui.md](docs/gui.md) | GUI-Architektur und Design-Patterns |
+
+### Docker-Schnellstart
+
+Siehe [DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md) fuer eine ausfuehrliche Anleitung.
+
+```bash
+# PostgreSQL starten
+cd docker && docker-compose up -d postgres
+
+# Verbindung testen
+docker exec -it template-postgres psql -U template -d templatedb
+
+# Container stoppen
+docker-compose down
+```
+
+### Maven-Artefakt-Integration
+
+Siehe [Maven-Artefakt-Integration.md](docs/Maven-Artefakt-Integration.md) fuer Details.
+
+```bash
+# SNAPSHOT-Build (Standard)
+mvn package
+
+# Release-Build
+mvn package -Prelease
+
+# Mit spezifischem Branch
+mvn package -Dtestfaelle.branch=feature-xyz
+```
+
+### Claude Code fortsetzen
+
+```
+Ich arbeite am Java-Projekt TemplateGUI unter E:\Projekte\ClaudeCode\TemplateGUI.
+Bitte lies die Datei docs/CLAUDE_CONTEXT.md fuer den Kontext.
+```
 
 ## Lizenz
 
