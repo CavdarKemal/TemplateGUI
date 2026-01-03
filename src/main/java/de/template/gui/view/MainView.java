@@ -39,6 +39,7 @@ public class MainView {
             frame.registerView(TreeView::new);
             frame.registerView(CustomerTreeView::new);
             frame.registerView(EditorView::new);
+            frame.registerView(ItsqTreeView::new);
 
             frame.setVisible(true);
         });
