@@ -1,6 +1,7 @@
 package de.cavdar.gui.view;
 
 import de.cavdar.gui.design.MainFrame;
+import de.cavdar.gui.jfd.view.ItsqExplorerView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ public class MainView {
             frame.registerView(CustomerTreeView::new);
             frame.registerView(EditorView::new);
             frame.registerView(ItsqTreeView::new);
+            frame.registerView(ItsqExplorerView::new);
 
             frame.setVisible(true);
         });
