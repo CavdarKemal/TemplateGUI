@@ -38,6 +38,7 @@ public class MainView {
             frame.registerView(AnalyseView::new);
             frame.registerView(TreeView::new);
             frame.registerView(CustomerTreeView::new);
+            frame.registerView(EditorView::new);
 
             frame.setVisible(true);
         });
