@@ -164,6 +164,8 @@ Erstellen Sie ein neues Panel in JFormDesigner (z.B. `InternalFrameMyView.java`)
 ```java
 package de.template.gui.design;
 
+import de.cavdar.gui.design.BaseViewPanel;
+
 public class MyViewPanel extends BaseViewPanel {
     private InternalFrameMyView myView;
 
@@ -199,6 +201,8 @@ public class MyViewPanel extends BaseViewPanel {
 
 ```java
 package de.template.gui.view;
+
+import de.cavdar.gui.view.BaseView;
 
 public class MyViewView extends BaseView {
     private MyViewPanel myPanel;
@@ -325,7 +329,7 @@ private void processData() {
 
 ### Aus IDE (IntelliJ)
 
-Main-Klasse: `de.template.gui.view.MainView`
+Main-Klasse: `view.de.cavdar.gui.MainView`
 
 ### Aus Distribution
 
