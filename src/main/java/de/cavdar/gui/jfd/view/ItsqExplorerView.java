@@ -385,21 +385,13 @@ public class ItsqExplorerView extends BaseView {
      * Wrapper to make ItsqMainPanel compatible with BaseView.
      */
     private static class ItsqMainPanelWrapper extends BaseViewPanel {
-        private final ItsqMainPanel mainPanel;
 
         public ItsqMainPanelWrapper(ItsqMainPanel mainPanel) {
-            this.mainPanel = mainPanel;
-        }
-
-        @Override
-        protected void initComponents() {
-            setLayout(new BorderLayout());
-            add(mainPanel, BorderLayout.CENTER);
-        }
-
-        @Override
-        public JToolBar getViewToolbar() {
-            return null; // ItsqMainPanel has its own controls
+            super();
+            // Hide the default toolbar since ItsqMainPanel has its own controls
+            viewToolbar.setVisible(false);
+            // Add mainPanel to the content area
+            getContentPanel().add(mainPanel, BorderLayout.CENTER);
         }
     }
 }
