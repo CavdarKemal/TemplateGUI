@@ -31,12 +31,12 @@ import static de.cavdar.gui.util.AppConstants.*;
  * - ItsqRefExportsPhaseTreeNode -> ItsqRefExportsPhaseView
  * - ItsqCustomerTreeNode -> ItsqCustomerView
  * - ItsqScenarioTreeNode -> ItsqScenarioView
- * - ItsqXmlTreeNode -> ItsqXmlView
- * - ItsqOptionsTreeNode -> ItsqOptionsView
- * - ItsqPropertiesTreeNode -> ItsqScenarioPropertiesView
+ * - ItsqXmlTreeNode -> ItsqXmlView (auch fuer .xml, Options.cfg, .properties)
+ * - ItsqOptionsTreeNode -> ItsqXmlView
+ * - ItsqPropertiesTreeNode -> ItsqXmlView
  *
  * @author TemplateGUI
- * @version 3.0
+ * @version 3.1
  */
 public class ItsqExplorerView extends BaseView {
     private static final Logger LOG = LoggerFactory.getLogger(ItsqExplorerView.class);
@@ -50,8 +50,6 @@ public class ItsqExplorerView extends BaseView {
     private static final String CARD_SCENARIO = "cardScenario";
     private static final String CARD_CUSTOMER = "cardCustomer";
     private static final String CARD_XML = "cardXml";
-    private static final String CARD_OPTIONS = "cardOptions";
-    private static final String CARD_SCENARIO_PROPERTIES = "cardScenarioProperties";
 
     private ItsqMainPanel mainPanel;
     private final AppConfig cfg = AppConfig.getInstance();
@@ -245,12 +243,10 @@ public class ItsqExplorerView extends BaseView {
             return CARD_CUSTOMER;
         } else if (node instanceof ItsqScenarioTreeNode) {
             return CARD_SCENARIO;
-        } else if (node instanceof ItsqXmlTreeNode) {
+        } else if (node instanceof ItsqXmlTreeNode
+                || node instanceof ItsqOptionsTreeNode
+                || node instanceof ItsqPropertiesTreeNode) {
             return CARD_XML;
-        } else if (node instanceof ItsqOptionsTreeNode) {
-            return CARD_OPTIONS;
-        } else if (node instanceof ItsqPropertiesTreeNode) {
-            return CARD_SCENARIO_PROPERTIES;
         }
         return CARD_ROOT;
     }
@@ -291,8 +287,6 @@ public class ItsqExplorerView extends BaseView {
             case CARD_CUSTOMER -> viewTabPanel.getPanelCustomer();
             case CARD_SCENARIO -> viewTabPanel.getPanelScenario();
             case CARD_XML -> viewTabPanel.getPanelXml();
-            case CARD_OPTIONS -> viewTabPanel.getPanelOptions();
-            case CARD_SCENARIO_PROPERTIES -> viewTabPanel.getPanelScenarioProperties();
             default -> null;
         };
     }
