@@ -1,5 +1,5 @@
-Im package de.cavdar.gui.jfd.design habe ich die GUI-Klassen, die ich mit JFormDesigner erstellt habe
-Im package de.cavdar.gui.jfd.view habe ich die View-Klassen, die jeweils Klassen aus dem design-Package erben
+Im package de.cavdar.gui.itsq.design habe ich die GUI-Klassen, die ich mit JFormDesigner erstellt habe
+Im package de.cavdar.gui.itsq.view habe ich die View-Klassen, die jeweils Klassen aus dem design-Package erben
 
 Im Projekt-Ordner ist ein Bild aus dem JFormDesigner für das Panel ItsqMainPanel.jfd
 

@@ -22,12 +22,12 @@
 ## Letzte Aenderungen
 
 **04.01.2026** - Typisiertes Tree-Model (ItsqTreeModel):
-- **Neues Package `de.cavdar.gui.jfd.model`**: Model-Klassen (UserObjects)
+- **Neues Package `de.cavdar.gui.itsq.model`**: Model-Klassen (UserObjects)
   - `ItsqItem` Interface als Basis
   - `ItsqRoot`, `ItsqArchivBestand`, `ItsqArchivBestandPhase`
   - `ItsqRefExports`, `ItsqRefExportsPhase`, `ItsqCustomer`, `ItsqScenario`
   - `ItsqXmlFile`, `ItsqOptionsFile`, `ItsqPropertiesFile`
-- **Neues Package `de.cavdar.gui.jfd.tree`**: TreeNode-Klassen
+- **Neues Package `de.cavdar.gui.itsq.tree`**: TreeNode-Klassen
   - `ItsqTreeNode` Basisklasse (extends DefaultMutableTreeNode)
   - Spezifische Nodes: `ItsqRootTreeNode`, `ItsqCustomerTreeNode`, etc.
   - `ItsqTreeModel` mit Factory-Logik fuer Node-Erstellung
@@ -36,7 +36,7 @@
   - `ItsqItemSelectable` Interface mit `ItsqItem` statt `File`
 
 **04.01.2026** - JFormDesigner Integration:
-- **Neues Package `de.cavdar.gui.jfd`**: GUI-Klassen aus JFormDesigner
+- **Neues Package `de.cavdar.gui.itsq`**: GUI-Klassen aus JFormDesigner
   - `jfd/design/`: JFormDesigner-generierte Panels (ItsqMainPanel, ItsqTreePanel, etc.)
   - `jfd/view/`: View-Klassen die design-Klassen erweitern
 - **ItsqExplorerView**: Neue View mit JFD-GUI und CardLayout-Switching
