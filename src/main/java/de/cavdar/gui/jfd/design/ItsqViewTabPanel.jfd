@@ -48,7 +48,7 @@ new FormModel {
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "cardScenario"
 			} )
-			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqXmlView" ) {
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqEditorView" ) {
 				name: "panelXml"
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "cardXml"

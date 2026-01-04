@@ -47,4 +47,9 @@ Erledigt:
         REF-EXPORTS/PHASE-x/c0x/Relevanx-xyz/*.properties   -> ItsqXmlView
     alle unnötigen *Panel, *.jfd und *View Dateien entfernen.
 
-Neu:
+Erledigt:
+    ITSQ-Explorer (ItsqExplorerView): nach dem Laden der ITSQ-Infos sollte die selektierte Quelle in die comboBoxTestSet hinzugefügt werden
+                                      die ComboBox sollte eine History besitzen. Be wechsel des CB-Items soll das TreeModel aktualisert werden.
+
+Neue Wünsche:
+    Ich habe im Verzeichnis "delivery" ein Test-Set kopiert (LOCAL). Bitte dieses Verzeichnis in den Assembly-Decriptor aufnehmen, so dass das Verzeichnis ins Root-Verzeichnis der Distibution kopiert wird.
