@@ -1,4 +1,4 @@
-package de.cavdar.gui.design;
+package de.cavdar.gui.design.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

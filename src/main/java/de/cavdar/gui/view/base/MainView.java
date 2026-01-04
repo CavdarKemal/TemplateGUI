@@ -1,7 +1,9 @@
-package de.cavdar.gui.view;
+package de.cavdar.gui.view.base;
 
-import de.cavdar.gui.design.MainFrame;
+import de.cavdar.gui.design.base.MainFrame;
 import de.cavdar.gui.jfd.view.ItsqExplorerView;
+import de.cavdar.gui.view.json.ItsqTreeView;
+import de.cavdar.gui.view.prozess.ProzessView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

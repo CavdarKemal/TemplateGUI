@@ -1,4 +1,5 @@
-package de.cavdar.gui.design;
+package de.cavdar.gui.design.prozess;
+import de.cavdar.gui.design.base.BaseViewPanel;
 
 import de.cavdar.gui.util.IconLoader;
 

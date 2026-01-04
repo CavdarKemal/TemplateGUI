@@ -1,8 +1,9 @@
-package de.cavdar.gui.view;
+package de.cavdar.gui.view.json;
+import de.cavdar.gui.view.base.BaseView;
 
-import de.cavdar.gui.design.BaseViewPanel;
-import de.cavdar.gui.design.ItsqTreeViewPanel;
-import de.cavdar.gui.model.AppConfig;
+import de.cavdar.gui.design.base.BaseViewPanel;
+import de.cavdar.gui.design.json.ItsqTreeViewPanel;
+import de.cavdar.gui.model.base.AppConfig;
 
 import static de.cavdar.gui.util.AppConstants.*;
 import org.slf4j.Logger;

@@ -1,9 +1,10 @@
-package de.cavdar.gui.view;
+package de.cavdar.gui.view.db;
+import de.cavdar.gui.view.base.BaseView;
 
-import de.cavdar.gui.design.BaseViewPanel;
-import de.cavdar.gui.design.DatabaseViewPanel;
-import de.cavdar.gui.model.AppConfig;
-import de.cavdar.gui.model.ConnectionInfo;
+import de.cavdar.gui.design.base.BaseViewPanel;
+import de.cavdar.gui.design.db.DatabaseViewPanel;
+import de.cavdar.gui.model.base.AppConfig;
+import de.cavdar.gui.model.base.ConnectionInfo;
 import de.cavdar.gui.util.AppConstants;
 import de.cavdar.gui.util.ConnectionManager;
 

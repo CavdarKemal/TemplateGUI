@@ -1,7 +1,7 @@
 package de.cavdar.gui.util;
 
-import de.cavdar.gui.model.AppConfig;
-import de.cavdar.gui.model.ConnectionInfo;
+import de.cavdar.gui.model.base.AppConfig;
+import de.cavdar.gui.model.base.ConnectionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,8 @@
-package de.cavdar.gui.view;
+package de.cavdar.gui.view.prozess;
+import de.cavdar.gui.view.base.BaseView;
 
-import de.cavdar.gui.design.BaseViewPanel;
-import de.cavdar.gui.design.ProzessViewPanel;
+import de.cavdar.gui.design.base.BaseViewPanel;
+import de.cavdar.gui.design.prozess.ProzessViewPanel;
 import de.cavdar.gui.util.IconLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,9 +1,9 @@
-package de.cavdar.gui.design;
+package de.cavdar.gui.design.base;
 
-import de.cavdar.gui.model.AppConfig;
+import de.cavdar.gui.model.base.AppConfig;
 import de.cavdar.gui.util.ConnectionManager;
 import de.cavdar.gui.util.TestEnvironmentManager;
-import de.cavdar.gui.view.BaseView;
+import de.cavdar.gui.view.base.BaseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

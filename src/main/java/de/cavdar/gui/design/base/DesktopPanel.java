@@ -1,7 +1,7 @@
-package de.cavdar.gui.design;
+package de.cavdar.gui.design.base;
 
-import de.cavdar.gui.view.BaseView;
-import de.cavdar.gui.view.DatabaseView;
+import de.cavdar.gui.view.base.BaseView;
+import de.cavdar.gui.view.db.DatabaseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

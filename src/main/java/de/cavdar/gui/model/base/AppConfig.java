@@ -1,4 +1,4 @@
-package de.cavdar.gui.model;
+package de.cavdar.gui.model.base;
 
 import de.cavdar.gui.exception.ConfigurationException;
 import org.slf4j.Logger;

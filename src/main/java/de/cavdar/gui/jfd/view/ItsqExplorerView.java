@@ -1,11 +1,11 @@
 package de.cavdar.gui.jfd.view;
 
-import de.cavdar.gui.design.BaseViewPanel;
+import de.cavdar.gui.design.base.BaseViewPanel;
 import de.cavdar.gui.jfd.design.ItsqMainPanel;
 import de.cavdar.gui.jfd.model.ItsqItem;
 import de.cavdar.gui.jfd.tree.*;
-import de.cavdar.gui.model.AppConfig;
-import de.cavdar.gui.view.BaseView;
+import de.cavdar.gui.model.base.AppConfig;
+import de.cavdar.gui.view.base.BaseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

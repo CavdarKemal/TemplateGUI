@@ -1,4 +1,4 @@
-package de.cavdar.gui.view;
+package de.cavdar.gui.view.base;
 
 import javax.swing.*;
 

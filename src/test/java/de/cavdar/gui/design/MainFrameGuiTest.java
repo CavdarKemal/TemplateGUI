@@ -1,9 +1,10 @@
 package de.cavdar.gui.design;
 
 import de.cavdar.gui.jfd.view.ItsqExplorerView;
+import de.cavdar.gui.design.base.MainFrame;
 import de.cavdar.gui.util.TestEnvironmentManager;
-import de.cavdar.gui.view.ItsqTreeView;
-import de.cavdar.gui.view.ProzessView;
+import de.cavdar.gui.view.json.ItsqTreeView;
+import de.cavdar.gui.view.prozess.ProzessView;
 import org.assertj.swing.core.BasicRobot;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.core.Robot;
