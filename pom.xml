@@ -29,6 +29,7 @@
         <slf4j-reload4j.version>2.0.6</slf4j-reload4j.version>
         <postgresql.version>42.7.4</postgresql.version>
         <jackson.version>2.17.0</jackson.version>
+        <rsyntaxtextarea.version>3.5.2</rsyntaxtextarea.version>
     </properties>
 
     <build>
@@ -186,6 +187,13 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- RSyntaxTextArea for syntax highlighting -->
+        <dependency>
+            <groupId>com.fifesoft</groupId>
+            <artifactId>rsyntaxtextarea</artifactId>
+            <version>${rsyntaxtextarea.version}</version>
         </dependency>
     </dependencies>
 </project>
