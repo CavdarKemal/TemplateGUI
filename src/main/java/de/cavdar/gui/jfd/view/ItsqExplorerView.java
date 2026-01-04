@@ -31,9 +31,9 @@ import static de.cavdar.gui.util.AppConstants.*;
  * - ItsqRefExportsPhaseTreeNode -> ItsqRefExportsPhaseView
  * - ItsqCustomerTreeNode -> ItsqCustomerView
  * - ItsqScenarioTreeNode -> ItsqScenarioView
- * - ItsqXmlTreeNode -> ItsqXmlView (auch fuer .xml, Options.cfg, .properties)
- * - ItsqOptionsTreeNode -> ItsqXmlView
- * - ItsqPropertiesTreeNode -> ItsqXmlView
+ * - ItsqXmlTreeNode -> ItsqEditorView (auch fuer .xml, Options.cfg, .properties)
+ * - ItsqOptionsTreeNode -> ItsqEditorView
+ * - ItsqPropertiesTreeNode -> ItsqEditorView
  *
  * @author TemplateGUI
  * @version 3.1
@@ -286,7 +286,7 @@ public class ItsqExplorerView extends BaseView {
             case CARD_REF_EXPORTS_PHASE -> viewTabPanel.getPanelRefExportsPhase();
             case CARD_CUSTOMER -> viewTabPanel.getPanelCustomer();
             case CARD_SCENARIO -> viewTabPanel.getPanelScenario();
-            case CARD_XML -> viewTabPanel.getPanelXml();
+            case CARD_XML -> viewTabPanel.getPanelEditor();
             default -> null;
         };
     }

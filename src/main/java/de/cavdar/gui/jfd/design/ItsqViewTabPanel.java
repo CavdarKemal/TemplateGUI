@@ -47,8 +47,12 @@ public class ItsqViewTabPanel extends JPanel {
         return panelScenario;
     }
 
-    public ItsqXmlView getPanelXml() {
-        return panelXml;
+    public ItsqEditorView getPanelEditor() {
+        return panelEditor;
+    }
+
+    public ItsqEditorView getPanelOptions() {
+        return panelOptions;
     }
 
     private void initComponents() {
@@ -60,7 +64,9 @@ public class ItsqViewTabPanel extends JPanel {
         panelRefExportsPhase = new ItsqRefExportsPhaseView();
         panelCustomer = new ItsqCustomerView();
         panelScenario = new ItsqScenarioView();
-        panelXml = new ItsqXmlView();
+        panelEditor = new ItsqEditorView();
+        panelOptions = new ItsqEditorView();
+        panelScenarioProperties = new ItsqEditorView();
 
         //======== this ========
         setBorder(new EtchedBorder());
@@ -72,7 +78,9 @@ public class ItsqViewTabPanel extends JPanel {
         add(panelRefExportsPhase, "cardRefExportsPhase");
         add(panelCustomer, "cardCustomer");
         add(panelScenario, "cardScenario");
-        add(panelXml, "cardXml");
+        add(panelEditor, "cardXml");
+        add(panelOptions, "cardOptions");
+        add(panelScenarioProperties, "cardScenarioProperties");
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 
@@ -84,6 +92,8 @@ public class ItsqViewTabPanel extends JPanel {
     private ItsqRefExportsPhaseView panelRefExportsPhase;
     private ItsqCustomerView panelCustomer;
     private ItsqScenarioView panelScenario;
-    private ItsqXmlView panelXml;
+    private ItsqEditorView panelEditor;
+    private ItsqEditorView panelOptions;
+    private ItsqEditorView panelScenarioProperties;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

@@ -1,6 +1,6 @@
 package de.cavdar.gui.jfd.view;
 
-import de.cavdar.gui.jfd.design.ItsqXmlPanel;
+import de.cavdar.gui.jfd.design.ItsqEditorPanel;
 import de.cavdar.gui.jfd.model.ItsqItem;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -15,7 +15,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -28,8 +29,8 @@ import java.nio.file.Files;
  * - Find/Replace
  * - Copy/Paste (built-in)
  */
-public class ItsqXmlView extends ItsqXmlPanel implements ItsqItemSelectable {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqXmlView.class);
+public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectable {
+    private static final Logger LOG = LoggerFactory.getLogger(ItsqEditorView.class);
 
     private ItsqItem selectedItem;
     private RSyntaxTextArea textArea;
@@ -42,7 +43,7 @@ public class ItsqXmlView extends ItsqXmlPanel implements ItsqItemSelectable {
     private boolean modified = false;
     private static final int MAX_SEARCH_HISTORY = 20;
 
-    public ItsqXmlView() {
+    public ItsqEditorView() {
         super();
         initSyntaxEditor();
         setupToolbar();
@@ -91,11 +92,19 @@ public class ItsqXmlView extends ItsqXmlPanel implements ItsqItemSelectable {
         // Track modifications
         textArea.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { setModified(true); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                setModified(true);
+            }
+
             @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { setModified(true); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                setModified(true);
+            }
+
             @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { setModified(true); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                setModified(true);
+            }
         });
     }
 
@@ -179,7 +188,9 @@ public class ItsqXmlView extends ItsqXmlPanel implements ItsqItemSelectable {
         textArea.getInputMap().put(f3Key, "findNext");
         textArea.getActionMap().put("findNext", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { findNext(); }
+            public void actionPerformed(ActionEvent e) {
+                findNext();
+            }
         });
 
         // Shift+F3 - Find Previous
@@ -187,7 +198,9 @@ public class ItsqXmlView extends ItsqXmlPanel implements ItsqItemSelectable {
         textArea.getInputMap().put(shiftF3Key, "findPrev");
         textArea.getActionMap().put("findPrev", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { findPrevious(); }
+            public void actionPerformed(ActionEvent e) {
+                findPrevious();
+            }
         });
 
         // Ctrl+S - Save
@@ -195,7 +208,9 @@ public class ItsqXmlView extends ItsqXmlPanel implements ItsqItemSelectable {
         textArea.getInputMap().put(saveKey, "save");
         textArea.getActionMap().put("save", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { saveFile(); }
+            public void actionPerformed(ActionEvent e) {
+                saveFile();
+            }
         });
 
         // Ctrl+G - Go to Line
@@ -203,7 +218,9 @@ public class ItsqXmlView extends ItsqXmlPanel implements ItsqItemSelectable {
         textArea.getInputMap().put(gotoKey, "gotoLine");
         textArea.getActionMap().put("gotoLine", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { showGoToLineDialog(); }
+            public void actionPerformed(ActionEvent e) {
+                showGoToLineDialog();
+            }
         });
     }
 
