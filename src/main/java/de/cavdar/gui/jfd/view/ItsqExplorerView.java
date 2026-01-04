@@ -244,7 +244,7 @@ public class ItsqExplorerView extends BaseView {
 
     @Override
     public String getToolbarLabel() {
-        return "ITSQ-JFD";
+        return "ITSQ-Test-Set";
     }
 
     @Override

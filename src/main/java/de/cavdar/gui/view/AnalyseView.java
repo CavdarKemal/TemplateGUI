@@ -53,7 +53,7 @@ public class AnalyseView extends BaseView {
 
     @Override
     public String getToolbarLabel() {
-        return "Analyse";
+        return null;
     }
 
     @Override

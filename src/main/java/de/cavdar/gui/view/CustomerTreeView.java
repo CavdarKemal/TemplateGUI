@@ -903,7 +903,7 @@ public class CustomerTreeView extends TreeView {
 
     @Override
     public String getToolbarLabel() {
-        return "Kunden";
+        return null;
     }
 
     @Override

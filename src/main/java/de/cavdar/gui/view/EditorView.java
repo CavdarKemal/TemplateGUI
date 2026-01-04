@@ -81,7 +81,7 @@ public class EditorView extends BaseView {
 
     @Override
     public String getToolbarLabel() {
-        return "Editor";
+        return null;
     }
 
     @Override

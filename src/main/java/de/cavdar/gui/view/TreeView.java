@@ -214,7 +214,7 @@ public class TreeView extends BaseView {
 
     @Override
     public String getToolbarLabel() {
-        return "Tree";
+        return null;
     }
 
     @Override

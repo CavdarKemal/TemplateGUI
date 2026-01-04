@@ -111,7 +111,7 @@ public class ItsqTreeView extends BaseView {
 
     @Override
     public String getToolbarLabel() {
-        return "ITSQ";
+        return "JSON-Explorer";
     }
 
     @Override
