@@ -19,3 +19,4 @@ release.properties
 .DS_Store
 Thumbs.db
 /LOCAL/*
+TEST-ENVS/

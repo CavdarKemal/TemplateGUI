@@ -2,6 +2,7 @@ package de.cavdar.gui.design;
 
 import de.cavdar.gui.model.AppConfig;
 import de.cavdar.gui.util.ConnectionManager;
+import de.cavdar.gui.util.TestEnvironmentManager;
 import de.cavdar.gui.view.BaseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,6 +237,9 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         configComboBox.setToolTipText("Konfigurationsdatei waehlen");
 
         refreshConfigList();
+
+        // Initialize test environment for current config at startup
+        TestEnvironmentManager.switchEnvironment(currentConfigName);
 
         configComboBox.addActionListener(e -> {
             if (e.getActionCommand().equals("comboBoxChanged")) {
@@ -500,6 +504,10 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         if (cfg.loadFrom(configFile.getAbsolutePath())) {
             currentConfigName = configName;
             setTitle("MDI Application - " + cfg.getProperty("TEST-BASE-PATH") + " [" + configName + "]");
+
+            // Switch test environment (creates directories and configures logging)
+            TestEnvironmentManager.switchEnvironment(configName);
+
             reloadAllSettings();
             LOG.info("Configuration loaded: {}", configName);
         } else {
