@@ -2,6 +2,8 @@ package de.cavdar.gui.jfd.view;
 
 import de.cavdar.gui.design.BaseViewPanel;
 import de.cavdar.gui.jfd.design.ItsqMainPanel;
+import de.cavdar.gui.jfd.model.ItsqItem;
+import de.cavdar.gui.jfd.tree.*;
 import de.cavdar.gui.model.AppConfig;
 import de.cavdar.gui.view.BaseView;
 import org.slf4j.Logger;
@@ -9,15 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Comparator;
 
 import static de.cavdar.gui.util.AppConstants.*;
 
@@ -25,46 +23,46 @@ import static de.cavdar.gui.util.AppConstants.*;
  * ITSQ Explorer View using JFormDesigner GUI.
  * Displays ITSQ test files with CardLayout-based detail views.
  *
- * Tree structure maps to card views:
- * - ITSQ (root) -> ItsqRootView
- * - ARCHIV-BESTAND -> ItsqArchivBestandView
- * - ARCHIV-BESTAND/PHASE-x -> ItsqArchibBestandPhaseView
- * - REF-EXPORTS -> ItsqRefExportsView
- * - REF-EXPORTS/PHASE-x -> ItsqRefExportsPhaseView
- * - REF-EXPORTS/PHASE-x/Relevanz-xyz -> ItsqScenarioView
- * - REF-EXPORTS/PHASE-x/Relevanz-xyz/c0x -> ItsqCustomerView
+ * Uses typed tree nodes for type-safe tree handling:
+ * - ItsqRootTreeNode -> ItsqRootView
+ * - ItsqArchivBestandTreeNode -> ItsqArchivBestandView
+ * - ItsqArchivBestandPhaseTreeNode -> ItsqArchibBestandPhaseView
+ * - ItsqRefExportsTreeNode -> ItsqRefExportsView
+ * - ItsqRefExportsPhaseTreeNode -> ItsqRefExportsPhaseView
+ * - ItsqCustomerTreeNode -> ItsqCustomerView
+ * - ItsqScenarioTreeNode -> ItsqScenarioView
+ * - ItsqXmlTreeNode -> ItsqXmlView
+ * - ItsqOptionsTreeNode -> ItsqOptionsView
+ * - ItsqPropertiesTreeNode -> ItsqScenarioPropertiesView
  *
  * @author TemplateGUI
- * @version 2.0
+ * @version 3.0
  */
 public class ItsqExplorerView extends BaseView {
     private static final Logger LOG = LoggerFactory.getLogger(ItsqExplorerView.class);
 
     // Card names (must match ItsqViewTabPanel)
-    private static final String CARD_ROOT = "card7";
+    private static final String CARD_ROOT = "cardItsqRoot";
     private static final String CARD_ARCHIV_BESTAND = "cardArchivBestand";
     private static final String CARD_ARCHIV_BESTAND_PHASE = "cardArchivBestandPhase";
     private static final String CARD_REF_EXPORTS = "cardRefExports";
     private static final String CARD_REF_EXPORTS_PHASE = "cardRefExportsPhase";
     private static final String CARD_SCENARIO = "cardScenario";
     private static final String CARD_CUSTOMER = "cardCustomer";
+    private static final String CARD_XML = "cardXml";
+    private static final String CARD_OPTIONS = "cardOptions";
+    private static final String CARD_SCENARIO_PROPERTIES = "cardScenarioProperties";
 
     private ItsqMainPanel mainPanel;
     private final AppConfig cfg = AppConfig.getInstance();
-    private DefaultTreeModel treeModel;
-    private DefaultMutableTreeNode rootNode;
-
-    // Statistics
-    private int totalFiles = 0;
-    private int totalDirs = 0;
+    private ItsqTreeModel treeModel;
 
     public ItsqExplorerView() {
         super("ITSQ Explorer (JFD)");
         setSize(1000, 700);
 
-        // Initialize tree model
-        rootNode = new DefaultMutableTreeNode("ITSQ");
-        treeModel = new DefaultTreeModel(rootNode);
+        // Initialize empty tree model
+        treeModel = new ItsqTreeModel(null);
         getTree().setModel(treeModel);
 
         // Load initial data
@@ -141,26 +139,17 @@ public class ItsqExplorerView extends BaseView {
             return;
         }
 
-        // Reset statistics
-        totalFiles = 0;
-        totalDirs = 0;
+        // Reload tree model
+        treeModel.reload(itsqDir);
 
-        // Build tree
-        rootNode.removeAllChildren();
-        rootNode.setUserObject("ITSQ: " + itsqDir.getName());
-
-        // Scan directory
-        scanDirectory(itsqDir, rootNode, 0);
-
-        // Update tree
-        treeModel.reload();
+        // Expand tree to level 2
         expandToLevel(getTree(), 2);
 
         // Show root card
-        showCard(CARD_ROOT);
+        showCard(CARD_ROOT, null);
 
         LOG.info("Loaded ITSQ directory: {} ({} files, {} dirs)",
-                itsqDir.getAbsolutePath(), totalFiles, totalDirs);
+                itsqDir.getAbsolutePath(), treeModel.getTotalFiles(), treeModel.getTotalDirs());
     }
 
     private File resolveItsqPath() {
@@ -195,36 +184,14 @@ public class ItsqExplorerView extends BaseView {
         return new File(DEFAULT_ITSQ_PATH);
     }
 
-    private void scanDirectory(File dir, DefaultMutableTreeNode parentNode, int depth) {
-        File[] children = dir.listFiles();
-        if (children == null) {
-            return;
-        }
-
-        // Sort: directories first, then by name
-        Arrays.sort(children, Comparator
-                .comparing(File::isFile)
-                .thenComparing(File::getName));
-
-        for (File child : children) {
-            FileNode fileNode = new FileNode(child, depth);
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileNode);
-            parentNode.add(node);
-
-            if (child.isDirectory()) {
-                totalDirs++;
-                scanDirectory(child, node, depth + 1);
-            } else {
-                totalFiles++;
-            }
-        }
-    }
-
     private void expandToLevel(JTree tree, int level) {
-        expandNode(tree, rootNode, 0, level);
+        Object root = treeModel.getRoot();
+        if (root instanceof ItsqTreeNode rootNode) {
+            expandNode(tree, rootNode, 0, level);
+        }
     }
 
-    private void expandNode(JTree tree, DefaultMutableTreeNode node, int currentLevel, int maxLevel) {
+    private void expandNode(JTree tree, ItsqTreeNode node, int currentLevel, int maxLevel) {
         if (currentLevel >= maxLevel) {
             return;
         }
@@ -232,91 +199,102 @@ public class ItsqExplorerView extends BaseView {
         tree.expandPath(path);
 
         for (int i = 0; i < node.getChildCount(); i++) {
-            DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
-            expandNode(tree, child, currentLevel + 1, maxLevel);
+            if (node.getChildAt(i) instanceof ItsqTreeNode child) {
+                expandNode(tree, child, currentLevel + 1, maxLevel);
+            }
         }
     }
 
     // ===== Tree Selection -> Card Switching =====
 
     private void onTreeSelectionChanged(TreeSelectionEvent e) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) getTree().getLastSelectedPathComponent();
-        if (node == null) {
+        Object selectedComponent = getTree().getLastSelectedPathComponent();
+        if (!(selectedComponent instanceof ItsqTreeNode node)) {
             return;
         }
 
-        // Build path from root
-        TreePath treePath = new TreePath(node.getPath());
-        String cardName = determineCardForPath(treePath);
-        showCard(cardName);
+        // Determine card based on node type
+        String cardName = determineCardForNode(node);
 
-        LOG.debug("Tree selection: {} -> Card: {}", treePath, cardName);
+        // Get the ItsqItem from the node
+        ItsqItem item = node.getItsqItem();
+
+        // Show card and pass selected item to view
+        showCard(cardName, item);
+
+        LOG.debug("Tree selection: {} -> Card: {}",
+                item != null ? item.getName() : "null", cardName);
     }
 
     /**
-     * Determines which card to show based on the tree path.
+     * Determines which card to show based on the node type.
+     * Uses instanceof checks for type-safe dispatch.
      */
-    private String determineCardForPath(TreePath path) {
-        int pathCount = path.getPathCount();
-
-        // Root node (depth 1)
-        if (pathCount <= 1) {
+    private String determineCardForNode(ItsqTreeNode node) {
+        if (node instanceof ItsqRootTreeNode) {
             return CARD_ROOT;
-        }
-
-        // Get first level directory name
-        DefaultMutableTreeNode firstLevel = (DefaultMutableTreeNode) path.getPathComponent(1);
-        String firstLevelName = getNodeName(firstLevel);
-
-        // Depth 2: ARCHIV-BESTAND or REF-EXPORTS
-        if (pathCount == 2) {
-            if ("ARCHIV-BESTAND".equals(firstLevelName)) {
-                return CARD_ARCHIV_BESTAND;
-            } else if ("REF-EXPORTS".equals(firstLevelName)) {
-                return CARD_REF_EXPORTS;
-            }
-            return CARD_ROOT;
-        }
-
-        // Depth 3: PHASE-x under ARCHIV-BESTAND or REF-EXPORTS
-        if (pathCount == 3) {
-            if ("ARCHIV-BESTAND".equals(firstLevelName)) {
-                return CARD_ARCHIV_BESTAND_PHASE;
-            } else if ("REF-EXPORTS".equals(firstLevelName)) {
-                return CARD_REF_EXPORTS_PHASE;
-            }
-            return CARD_ROOT;
-        }
-
-        // Depth 4+: REF-EXPORTS/PHASE-x/Relevanz-xyz -> Scenario
-        if (pathCount == 4 && "REF-EXPORTS".equals(firstLevelName)) {
-            return CARD_SCENARIO;
-        }
-
-        // Depth 5+: REF-EXPORTS/PHASE-x/Relevanz-xyz/c0x -> Customer
-        if (pathCount >= 5 && "REF-EXPORTS".equals(firstLevelName)) {
+        } else if (node instanceof ItsqArchivBestandTreeNode) {
+            return CARD_ARCHIV_BESTAND;
+        } else if (node instanceof ItsqArchivBestandPhaseTreeNode) {
+            return CARD_ARCHIV_BESTAND_PHASE;
+        } else if (node instanceof ItsqRefExportsTreeNode) {
+            return CARD_REF_EXPORTS;
+        } else if (node instanceof ItsqRefExportsPhaseTreeNode) {
+            return CARD_REF_EXPORTS_PHASE;
+        } else if (node instanceof ItsqCustomerTreeNode) {
             return CARD_CUSTOMER;
+        } else if (node instanceof ItsqScenarioTreeNode) {
+            return CARD_SCENARIO;
+        } else if (node instanceof ItsqXmlTreeNode) {
+            return CARD_XML;
+        } else if (node instanceof ItsqOptionsTreeNode) {
+            return CARD_OPTIONS;
+        } else if (node instanceof ItsqPropertiesTreeNode) {
+            return CARD_SCENARIO_PROPERTIES;
         }
-
-        // Default
         return CARD_ROOT;
     }
 
-    private String getNodeName(DefaultMutableTreeNode node) {
-        Object userObject = node.getUserObject();
-        if (userObject instanceof FileNode fileNode) {
-            return fileNode.getFile().getName();
+    /**
+     * Shows the specified card and passes the selected item to the view.
+     *
+     * @param cardName the card to show
+     * @param item the selected ItsqItem (may be null)
+     */
+    private void showCard(String cardName, ItsqItem item) {
+        ItsqViewTabView viewTabPanel = getViewTabPanel();
+        if (viewTabPanel == null) {
+            return;
         }
-        return userObject.toString();
+
+        // Switch card
+        CardLayout cardLayout = (CardLayout) viewTabPanel.getLayout();
+        cardLayout.show(viewTabPanel, cardName);
+
+        // Pass selected item to the view
+        JPanel panel = getViewPanelForCard(cardName, viewTabPanel);
+        if (panel instanceof ItsqItemSelectable selectable) {
+            selectable.setSelectedItem(item);
+        }
     }
 
-    private void showCard(String cardName) {
-        // Get the CardLayout panel (right side of split)
-        ItsqViewTabView viewTabPanel = getViewTabPanel();
-        if (viewTabPanel != null) {
-            CardLayout cardLayout = (CardLayout) viewTabPanel.getLayout();
-            cardLayout.show(viewTabPanel, cardName);
-        }
+    /**
+     * Gets the view panel for the given card name.
+     */
+    private JPanel getViewPanelForCard(String cardName, ItsqViewTabView viewTabPanel) {
+        return switch (cardName) {
+            case CARD_ROOT -> viewTabPanel.getPanelRoot();
+            case CARD_ARCHIV_BESTAND -> viewTabPanel.getPanelArchivBestand();
+            case CARD_ARCHIV_BESTAND_PHASE -> viewTabPanel.getPanelArchivBestandPhase();
+            case CARD_REF_EXPORTS -> viewTabPanel.getPanelRefExports();
+            case CARD_REF_EXPORTS_PHASE -> viewTabPanel.getPanelRefExportsPhase();
+            case CARD_CUSTOMER -> viewTabPanel.getPanelCustomer();
+            case CARD_SCENARIO -> viewTabPanel.getPanelScenario();
+            case CARD_XML -> viewTabPanel.getPanelXml();
+            case CARD_OPTIONS -> viewTabPanel.getPanelOptions();
+            case CARD_SCENARIO_PROPERTIES -> viewTabPanel.getPanelScenarioProperties();
+            default -> null;
+        };
     }
 
     // ===== Actions =====
@@ -353,33 +331,11 @@ public class ItsqExplorerView extends BaseView {
         return mainPanel;
     }
 
-    // ===== Inner Classes =====
-
-    /**
-     * Wrapper for File with depth information.
-     */
-    private static class FileNode {
-        private final File file;
-        private final int depth;
-
-        public FileNode(File file, int depth) {
-            this.file = file;
-            this.depth = depth;
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        public int getDepth() {
-            return depth;
-        }
-
-        @Override
-        public String toString() {
-            return file.getName();
-        }
+    public ItsqTreeModel getTreeModel() {
+        return treeModel;
     }
+
+    // ===== Inner Classes =====
 
     /**
      * Wrapper to make ItsqMainPanel compatible with BaseView.

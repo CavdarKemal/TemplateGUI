@@ -16,7 +16,7 @@ new FormModel {
 			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqRootView" ) {
 				name: "panelRoot"
 			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "card7"
+				"value": "cardItsqRoot"
 			} )
 			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqArchivBestandView" ) {
 				name: "panelArchivBestand"
@@ -47,6 +47,24 @@ new FormModel {
 				name: "panelScenario"
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "cardScenario"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqXmlView" ) {
+				name: "panelXml"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardXml"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqOptionsView" ) {
+				name: "panelOptions"
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardOptions"
+			} )
+			add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqScenarioPropertiesView" ) {
+				name: "panelScenarioProperties"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "cardScenarioProperties"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

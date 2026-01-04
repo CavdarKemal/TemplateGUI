@@ -21,6 +21,20 @@
 
 ## Letzte Aenderungen
 
+**04.01.2026** - Typisiertes Tree-Model (ItsqTreeModel):
+- **Neues Package `de.cavdar.gui.jfd.model`**: Model-Klassen (UserObjects)
+  - `ItsqItem` Interface als Basis
+  - `ItsqRoot`, `ItsqArchivBestand`, `ItsqArchivBestandPhase`
+  - `ItsqRefExports`, `ItsqRefExportsPhase`, `ItsqCustomer`, `ItsqScenario`
+  - `ItsqXmlFile`, `ItsqOptionsFile`, `ItsqPropertiesFile`
+- **Neues Package `de.cavdar.gui.jfd.tree`**: TreeNode-Klassen
+  - `ItsqTreeNode` Basisklasse (extends DefaultMutableTreeNode)
+  - Spezifische Nodes: `ItsqRootTreeNode`, `ItsqCustomerTreeNode`, etc.
+  - `ItsqTreeModel` mit Factory-Logik fuer Node-Erstellung
+- **Refactored ItsqExplorerView**: Verwendet jetzt typisierte Nodes
+  - `instanceof`-Checks statt String-Vergleiche
+  - `ItsqItemSelectable` Interface mit `ItsqItem` statt `File`
+
 **04.01.2026** - JFormDesigner Integration:
 - **Neues Package `de.cavdar.gui.jfd`**: GUI-Klassen aus JFormDesigner
   - `jfd/design/`: JFormDesigner-generierte Panels (ItsqMainPanel, ItsqTreePanel, etc.)
@@ -126,7 +140,7 @@ de.cavdar.gui/
 │   ├── ConfigurationException.java
 │   └── ViewException.java
 │
-└── jfd/                        # JFormDesigner Klassen (NEU)
+└── jfd/                        # JFormDesigner Klassen
     ├── design/                 # JFD-generierte Panels
     │   ├── ItsqMainPanel.java      # Hauptpanel mit SplitPane
     │   ├── ItsqTreePanel.java      # Tree-Panel (links)
@@ -137,19 +151,53 @@ de.cavdar.gui/
     │   ├── ItsqRefExportsPanel.java
     │   ├── ItsqRefExportsPhasePanel.java
     │   ├── ItsqCustomerPanel.java
-    │   └── ItsqScenarioPanel.java
+    │   ├── ItsqScenarioPanel.java
+    │   ├── ItsqXmlPanel.java
+    │   ├── ItsqOptionsPanel.java
+    │   └── ItsqScenarioPropertiesPanel.java
+    │
+    ├── model/                  # Model-Klassen (UserObjects)
+    │   ├── ItsqItem.java           # Basis-Interface
+    │   ├── ItsqRoot.java
+    │   ├── ItsqArchivBestand.java
+    │   ├── ItsqArchivBestandPhase.java
+    │   ├── ItsqRefExports.java
+    │   ├── ItsqRefExportsPhase.java
+    │   ├── ItsqCustomer.java
+    │   ├── ItsqScenario.java
+    │   ├── ItsqXmlFile.java
+    │   ├── ItsqOptionsFile.java
+    │   └── ItsqPropertiesFile.java
+    │
+    ├── tree/                   # TreeNode-Klassen
+    │   ├── ItsqTreeModel.java      # TreeModel mit Factory-Logik
+    │   ├── ItsqTreeNode.java       # Basis-TreeNode
+    │   ├── ItsqRootTreeNode.java
+    │   ├── ItsqArchivBestandTreeNode.java
+    │   ├── ItsqArchivBestandPhaseTreeNode.java
+    │   ├── ItsqRefExportsTreeNode.java
+    │   ├── ItsqRefExportsPhaseTreeNode.java
+    │   ├── ItsqCustomerTreeNode.java
+    │   ├── ItsqScenarioTreeNode.java
+    │   ├── ItsqXmlTreeNode.java
+    │   ├── ItsqOptionsTreeNode.java
+    │   └── ItsqPropertiesTreeNode.java
     │
     └── view/                   # View-Klassen
-        ├── ItsqExplorerView.java   # Hauptview (extends BaseView)
-        ├── ItsqPanelTree.java      # extends ItsqTreePanel
-        ├── ItsqViewTabView.java    # extends ItsqViewTabPanel
+        ├── ItsqExplorerView.java       # Hauptview (extends BaseView)
+        ├── ItsqItemSelectable.java     # Interface fuer Item-Selektion
+        ├── ItsqPanelTree.java          # extends ItsqTreePanel
+        ├── ItsqViewTabView.java        # extends ItsqViewTabPanel
         ├── ItsqRootView.java
         ├── ItsqArchivBestandView.java
         ├── ItsqArchibBestandPhaseView.java
         ├── ItsqRefExportsView.java
         ├── ItsqRefExportsPhaseView.java
         ├── ItsqCustomerView.java
-        └── ItsqScenarioView.java
+        ├── ItsqScenarioView.java
+        ├── ItsqXmlView.java
+        ├── ItsqOptionsView.java
+        └── ItsqScenarioPropertiesView.java
 ```
 
 ## Design-View-Trennung Pattern
@@ -291,12 +339,38 @@ docker-compose up -d postgres
 - **Maven:** 3.6+
 - **Docker:** Optional fuer PostgreSQL
 
+## Typisiertes Tree-Model
+
+Das ITSQ Tree-Model verwendet typisierte Klassen statt generischer Nodes:
+
+```
+ItsqItem (Interface)
+   ├── ItsqRoot
+   ├── ItsqArchivBestand
+   ├── ItsqArchivBestandPhase
+   ├── ItsqRefExports
+   ├── ItsqRefExportsPhase
+   ├── ItsqCustomer
+   ├── ItsqScenario
+   ├── ItsqXmlFile
+   ├── ItsqOptionsFile
+   └── ItsqPropertiesFile
+
+ItsqTreeNode (extends DefaultMutableTreeNode)
+   ├── ItsqRootTreeNode
+   ├── ItsqArchivBestandTreeNode
+   ├── ... (je ein Node pro Model-Klasse)
+```
+
+**Vorteile:**
+- Typsicherheit durch `instanceof`-Checks
+- Zugriff auf spezifische Properties (z.B. `customer.getCustomerId()`)
+- Erweiterbar fuer neue Node-Typen
+
 ## Offene Punkte (Stand 04.01.2026)
 
-Die ItsqExplorerView (JFormDesigner-basiert) laeuft, aber es gibt noch Kleinigkeiten:
-- TODO: Konkrete Issues vom Benutzer abwarten und beheben
-- Die JFD View-Klassen (ItsqRootView, ItsqArchivBestandView, etc.) sind noch leer (nur Konstruktor)
-- Diese koennen mit Logik befuellt werden wenn Details bekannt sind
+- Die View-Klassen (ItsqRootView, ItsqCustomerView, etc.) implementieren `ItsqItemSelectable`
+- Views koennen mit Logik befuellt werden um den `ItsqItem` anzuzeigen/bearbeiten
 
 ## Prompt zum Fortsetzen
 
@@ -304,10 +378,10 @@ Die ItsqExplorerView (JFormDesigner-basiert) laeuft, aber es gibt noch Kleinigke
 Ich arbeite am Java-Projekt TemplateGUI unter E:\Projekte\ClaudeCode\TemplateGUI.
 Bitte lies die Datei docs/CLAUDE_CONTEXT.md fuer den Kontext.
 
-Stand: ItsqExplorerView mit JFormDesigner GUI ist implementiert.
-- Tree wird aus ITSQ-Verzeichnis geladen
-- CardLayout wechselt basierend auf Tree-Selektion
-- Es gibt noch Kleinigkeiten zu fixen
+Stand: ItsqExplorerView mit typisiertem Tree-Model ist implementiert.
+- ItsqTreeModel mit Factory-Logik fuer Node-Erstellung
+- Typisierte Nodes (ItsqCustomerTreeNode, ItsqScenarioTreeNode, etc.)
+- Views erhalten ItsqItem via ItsqItemSelectable Interface
 
 Bitte lies todo.txt fuer aktuelle Aufgaben.
 ```

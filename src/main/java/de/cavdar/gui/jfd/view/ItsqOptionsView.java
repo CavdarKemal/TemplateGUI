@@ -1,12 +1,12 @@
 package de.cavdar.gui.jfd.view;
 
-import de.cavdar.gui.jfd.design.ItsqArchivBestandPanel;
+import de.cavdar.gui.jfd.design.ItsqOptionsPanel;
 import de.cavdar.gui.jfd.model.ItsqItem;
 
-public class ItsqArchivBestandView extends ItsqArchivBestandPanel implements ItsqItemSelectable {
+public class ItsqOptionsView extends ItsqOptionsPanel implements ItsqItemSelectable {
     private ItsqItem selectedItem;
 
-    public ItsqArchivBestandView() {
+    public ItsqOptionsView() {
         super();
     }
 
