@@ -24,6 +24,15 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
 
+        <!-- LOCAL Test-Set -->
+        <fileSet>
+            <directory>${project.basedir}/delivery/LOCAL</directory>
+            <outputDirectory>/LOCAL</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
         <!-- Entpackte Testfaelle einbinden -->
         <fileSet>
             <directory>${project.build.directory}/testfaelle</directory>
