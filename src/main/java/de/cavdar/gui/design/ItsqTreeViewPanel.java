@@ -3,18 +3,33 @@ package de.cavdar.gui.design;
 import de.cavdar.gui.util.IconLoader;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 
 /**
  * GUI panel for ItsqTreeView - displays ITSQ test files from embedded artifact.
  * Contains only layout and components, no listeners or business logic.
  * <p>
- * Extends TreeViewPanel to inherit the split pane layout.
+ * Extends BaseViewPanel with split pane layout containing tree and tabbed pane.
  *
  * @author TemplateGUI
- * @version 1.0
+ * @version 2.0
  */
-public class ItsqTreeViewPanel extends TreeViewPanel {
+public class ItsqTreeViewPanel extends BaseViewPanel {
+
+    // Tree components
+    protected DefaultMutableTreeNode rootNode;
+    protected DefaultTreeModel treeModel;
+    protected JTree tree;
+    protected JScrollPane treeScrollPane;
+
+    // Split pane layout
+    protected JSplitPane splitPane;
+    protected JPanel leftPanel;
+    protected JToolBar leftToolbar;
+    protected JToolBar rightToolbar;
+    protected JTabbedPane tabbedPane;
 
     // Toolbar container
     protected JPanel toolbarContainer;
@@ -54,13 +69,50 @@ public class ItsqTreeViewPanel extends TreeViewPanel {
     protected JLabel lblStatus;
 
     public ItsqTreeViewPanel() {
-        super("ITSQ");
+        super();
     }
 
     @Override
-    protected void initTreeComponents() {
-        super.initTreeComponents();
+    protected void initComponents() {
+        super.initComponents();
+        initTreeComponents();
         initItsqComponents();
+    }
+
+    /**
+     * Initializes tree and split pane components.
+     */
+    protected void initTreeComponents() {
+        // Create root node and tree model
+        rootNode = new DefaultMutableTreeNode("ITSQ");
+        treeModel = new DefaultTreeModel(rootNode);
+        tree = new JTree(treeModel);
+        tree.setShowsRootHandles(true);
+        treeScrollPane = new JScrollPane(tree);
+
+        // Create left panel with toolbar and tree
+        leftPanel = new JPanel(new BorderLayout());
+        leftToolbar = new JToolBar();
+        leftToolbar.setFloatable(false);
+        leftPanel.add(leftToolbar, BorderLayout.NORTH);
+        leftPanel.add(treeScrollPane, BorderLayout.CENTER);
+
+        // Create right panel with toolbar and tabbed pane
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightToolbar = new JToolBar();
+        rightToolbar.setFloatable(false);
+        rightPanel.add(rightToolbar, BorderLayout.NORTH);
+
+        tabbedPane = new JTabbedPane();
+        rightPanel.add(tabbedPane, BorderLayout.CENTER);
+
+        // Create split pane
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+        splitPane.setDividerLocation(300);
+        splitPane.setOneTouchExpandable(true);
+
+        // Add to content panel
+        contentPanel.add(splitPane, BorderLayout.CENTER);
     }
 
     /**
@@ -225,7 +277,33 @@ public class ItsqTreeViewPanel extends TreeViewPanel {
         return panel;
     }
 
-    // ===== Getters for View access =====
+    // ===== Tree Getters =====
+
+    public JTree getTree() {
+        return tree;
+    }
+
+    public DefaultTreeModel getTreeModel() {
+        return treeModel;
+    }
+
+    public DefaultMutableTreeNode getRootNode() {
+        return rootNode;
+    }
+
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+
+    public JToolBar getLeftToolbar() {
+        return leftToolbar;
+    }
+
+    public JToolBar getRightToolbar() {
+        return rightToolbar;
+    }
+
+    // ===== ITSQ-specific Getters =====
 
     public JTextField getItsqPathField() {
         return txtItsqPath;
@@ -273,9 +351,5 @@ public class ItsqTreeViewPanel extends TreeViewPanel {
 
     public JLabel getTotalSizeLabel() {
         return lblTotalSize;
-    }
-
-    public JTabbedPane getTabbedPane() {
-        return tabbedPane;
     }
 }

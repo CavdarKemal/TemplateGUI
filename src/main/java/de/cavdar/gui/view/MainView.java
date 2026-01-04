@@ -34,12 +34,7 @@ public class MainView {
             MainFrame frame = new MainFrame();
 
             // Register views dynamically
-            frame.registerView(SampleView::new);
             frame.registerView(ProzessView::new);
-            frame.registerView(AnalyseView::new);
-            frame.registerView(TreeView::new);
-            frame.registerView(CustomerTreeView::new);
-            frame.registerView(EditorView::new);
             frame.registerView(ItsqTreeView::new);
             frame.registerView(ItsqExplorerView::new);
 
