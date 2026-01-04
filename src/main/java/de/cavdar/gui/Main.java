@@ -1,4 +1,4 @@
-package de.cavdar.gui.view.base;
+package de.cavdar.gui;
 
 import de.cavdar.gui.design.base.MainFrame;
 import de.cavdar.gui.jfd.view.ItsqExplorerView;
@@ -16,8 +16,8 @@ import javax.swing.*;
  * @author TemplateGUI
  * @version 1.0
  */
-public class MainView {
-    private static final Logger LOG = LoggerFactory.getLogger(MainView.class);
+public class Main {
+    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     /**
      * Application entry point.
