@@ -62,9 +62,10 @@ public class ItsqExplorerView extends BaseView {
     private DefaultComboBoxModel<String> testSetHistoryModel;
     private boolean updatingComboBox = false;
     private boolean initialLoadDone = false;
+    private String lastValidSelection = null;
 
     public ItsqExplorerView() {
-        super("ITSQ Explorer (JFD)");
+        super("ITSQ-Test-Sets Verwalten");
         setSize(1000, 700);
 
         // Initialize empty tree model
@@ -226,12 +227,31 @@ public class ItsqExplorerView extends BaseView {
             cfg.setProperty(ITSQ_PATH_KEY, path);
             cfg.save();
 
+            // Save as last valid selection
+            lastValidSelection = path;
+
             // Reload
             loadItsqDirectory();
         } else {
             JOptionPane.showMessageDialog(this,
                     "Verzeichnis nicht gefunden: " + path,
                     "Fehler", JOptionPane.ERROR_MESSAGE);
+
+            // Remove invalid entry from ComboBox
+            updatingComboBox = true;
+            try {
+                testSetHistoryModel.removeElement(path);
+                saveTestSetHistory();
+
+                // Restore last valid selection
+                if (lastValidSelection != null) {
+                    mainPanel.getComboBoxTestSet().setSelectedItem(lastValidSelection);
+                } else if (testSetHistoryModel.getSize() > 0) {
+                    mainPanel.getComboBoxTestSet().setSelectedIndex(0);
+                }
+            } finally {
+                updatingComboBox = false;
+            }
         }
     }
 
@@ -284,11 +304,13 @@ public class ItsqExplorerView extends BaseView {
         // Show root card
         showCard(CARD_ROOT, null);
 
-        // Add to history
-        addToTestSetHistory(itsqDir.getAbsolutePath());
+        // Add to history and save as last valid selection
+        String path = itsqDir.getAbsolutePath();
+        addToTestSetHistory(path);
+        lastValidSelection = path;
 
         LOG.info("Loaded ITSQ directory: {} ({} files, {} dirs)",
-                itsqDir.getAbsolutePath(), treeModel.getTotalFiles(), treeModel.getTotalDirs());
+                path, treeModel.getTotalFiles(), treeModel.getTotalDirs());
     }
 
     private File resolveItsqPath() {
