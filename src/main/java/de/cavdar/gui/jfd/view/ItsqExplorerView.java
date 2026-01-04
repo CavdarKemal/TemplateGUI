@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -59,6 +61,7 @@ public class ItsqExplorerView extends BaseView {
     private ItsqTreeModel treeModel;
     private DefaultComboBoxModel<String> testSetHistoryModel;
     private boolean updatingComboBox = false;
+    private boolean initialLoadDone = false;
 
     public ItsqExplorerView() {
         super("ITSQ Explorer (JFD)");
@@ -68,11 +71,19 @@ public class ItsqExplorerView extends BaseView {
         treeModel = new ItsqTreeModel(null);
         getTree().setModel(treeModel);
 
-        // Initialize TestSet ComboBox with history
+        // Initialize TestSet ComboBox with history (no loading yet)
         initTestSetComboBox();
 
-        // Load initial data
-        SwingUtilities.invokeLater(this::loadItsqDirectory);
+        // Load data only when view is first activated
+        addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameActivated(InternalFrameEvent e) {
+                if (!initialLoadDone) {
+                    initialLoadDone = true;
+                    SwingUtilities.invokeLater(() -> loadItsqDirectory());
+                }
+            }
+        });
 
         LOG.debug("ItsqExplorerView created");
     }
@@ -111,8 +122,13 @@ public class ItsqExplorerView extends BaseView {
         comboBox.setModel(testSetHistoryModel);
         comboBox.setEditable(true);
 
-        // Load history from config
-        loadTestSetHistory();
+        // Load history from config (suppress ActionListener)
+        updatingComboBox = true;
+        try {
+            loadTestSetHistory();
+        } finally {
+            updatingComboBox = false;
+        }
 
         // Handle Enter in the editor
         JTextField editor = (JTextField) comboBox.getEditor().getEditorComponent();
