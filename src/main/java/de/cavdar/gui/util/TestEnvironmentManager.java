@@ -61,13 +61,37 @@ public class TestEnvironmentManager {
 
     /**
      * Resets the manager state. Useful for testing.
+     * Also closes any open FileAppender to release file handles.
      */
     public static void reset() {
+        closeLogging();
         currentEnvironment = null;
         currentEnvDir = null;
         currentLogsDir = null;
         currentTestOutputsDir = null;
         baseDirectory = null;
+    }
+
+    /**
+     * Closes the FileAppender to release file handles.
+     * Useful for testing to allow temp directory cleanup.
+     */
+    public static void closeLogging() {
+        try {
+            Logger rootLogger = Logger.getRootLogger();
+            Enumeration<?> appenders = rootLogger.getAllAppenders();
+
+            while (appenders.hasMoreElements()) {
+                Object appender = appenders.nextElement();
+                if (appender instanceof FileAppender) {
+                    FileAppender fileAppender = (FileAppender) appender;
+                    fileAppender.close();
+                    rootLogger.removeAppender(fileAppender);
+                }
+            }
+        } catch (Exception e) {
+            // Ignore errors during cleanup
+        }
     }
 
     /**
