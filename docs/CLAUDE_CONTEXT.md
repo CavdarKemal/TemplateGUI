@@ -21,37 +21,15 @@
 
 ## Letzte Aenderungen
 
+**04.01.2026** - Package-Refactoring:
+- **Main.java** nach `de.cavdar.gui` verschoben (vorher MainView.java in view/)
+- **Package `jfd` umbenannt zu `itsq`**: Bessere Namenskonvention
+- **Sub-Packages eingefuehrt**: design/base, design/prozess, view/base, view/prozess, model/base, etc.
+
 **04.01.2026** - Typisiertes Tree-Model (ItsqTreeModel):
-- **Neues Package `de.cavdar.gui.itsq.model`**: Model-Klassen (UserObjects)
-  - `ItsqItem` Interface als Basis
-  - `ItsqRoot`, `ItsqArchivBestand`, `ItsqArchivBestandPhase`
-  - `ItsqRefExports`, `ItsqRefExportsPhase`, `ItsqCustomer`, `ItsqScenario`
-  - `ItsqXmlFile`, `ItsqOptionsFile`, `ItsqPropertiesFile`
-- **Neues Package `de.cavdar.gui.itsq.tree`**: TreeNode-Klassen
-  - `ItsqTreeNode` Basisklasse (extends DefaultMutableTreeNode)
-  - Spezifische Nodes: `ItsqRootTreeNode`, `ItsqCustomerTreeNode`, etc.
-  - `ItsqTreeModel` mit Factory-Logik fuer Node-Erstellung
-- **Refactored ItsqExplorerView**: Verwendet jetzt typisierte Nodes
-  - `instanceof`-Checks statt String-Vergleiche
-  - `ItsqItemSelectable` Interface mit `ItsqItem` statt `File`
-
-**04.01.2026** - JFormDesigner Integration:
-- **Neues Package `de.cavdar.gui.itsq`**: GUI-Klassen aus JFormDesigner
-  - `jfd/design/`: JFormDesigner-generierte Panels (ItsqMainPanel, ItsqTreePanel, etc.)
-  - `jfd/view/`: View-Klassen die design-Klassen erweitern
-- **ItsqExplorerView**: Neue View mit JFD-GUI und CardLayout-Switching
-  - Tree-Selektion wechselt automatisch die Detail-View (CardLayout)
-  - Mapping: ITSQ->Root, ARCHIV-BESTAND->ArchivBestand, REF-EXPORTS->RefExports, etc.
-- **ResourceBundle**: `de/cavdar/gui/design/form.properties` fuer JFD-Panels
-- **AppConstants.java**: Zentrale Konstanten (NEW_CONNECTION, LOADING_NODE, etc.)
-
-**03.01.2026** - UI-Refactoring und Bugfixes:
-- **Dual-Toolbar Layout**: Config-Toolbar (Einstellungen) + View-Toolbar (View-Buttons)
-- **Kein linkes Split-Panel mehr**: Vereinfachtes Layout
-- **ItsqTreeView**: Neue View zum Browsen des eingebetteten ITSQ-Verzeichnisses
-- **Config-Filter**: Nur `*-config.properties` Dateien werden geladen
-- **isReloading-Flag**: Verhindert unbeabsichtigtes Speichern beim Config-Wechsel
-- **saveCurrentSettings()**: Speichert alle UI-Einstellungen vor Config-Wechsel
+- **Package `de.cavdar.gui.itsq.model`**: Model-Klassen (UserObjects)
+- **Package `de.cavdar.gui.itsq.tree`**: TreeNode-Klassen
+- **ItsqExplorerView**: Verwendet typisierte Nodes mit `instanceof`-Checks
 
 ## Projektstruktur
 
@@ -59,269 +37,68 @@
 TemplateGUI/
 ├── pom.xml                     # Maven Build mit Artefakt-Integration
 ├── README.md                   # Projektueberblick
-├── docker/
-│   ├── docker-compose.yml      # PostgreSQL + App Services
-│   ├── Dockerfile              # Multi-Stage Build
-│   └── init-db.sql             # DB-Initialisierung
-├── delivery/
-│   ├── config.properties       # Anwendungskonfiguration
-│   ├── log4j.properties        # Logging-Konfiguration
-│   └── startGUI.cmd            # Windows Startskript
 ├── docs/
 │   ├── CLAUDE_CONTEXT.md       # Dieses Dokument
-│   ├── DOCKER_GUIDE.md         # Docker-Anleitung
-│   ├── Maven-Artefakt-Integration.md
 │   └── gui.md                  # GUI-Architektur
-└── src/
-    ├── assembly/
-    │   └── distribution.xml    # Assembly Deskriptor
-    └── main/
-        ├── java/de/cavdar/gui/
-        │   ├── design/         # GUI Panels (Layout)
-        │   ├── view/           # Views (Logik)
-        │   ├── model/          # Datenmodelle
-        │   ├── util/           # Utilities
-        │   ├── exception/      # Exceptions
-        │   └── jfd/            # JFormDesigner Klassen (NEU)
-        │       ├── design/     # JFD-generierte Panels
-        │       └── view/       # View-Klassen fuer JFD
-        └── resources/
-            ├── icons/          # 38 PNG-Icons
-            └── de/cavdar/gui/design/
-                └── form.properties  # ResourceBundle fuer JFD
+└── src/main/java/de/cavdar/gui/
+    ├── Main.java               # Einstiegspunkt mit main()
+    ├── design/                 # GUI Panels (mit Sub-Packages)
+    │   ├── base/               # BaseViewPanel, MainFrame, DesktopPanel
+    │   ├── prozess/            # ProzessViewPanel
+    │   ├── db/                 # DatabaseViewPanel
+    │   └── json/               # ItsqTreeViewPanel
+    ├── view/                   # Views (mit Sub-Packages)
+    │   ├── base/               # BaseView, ViewInfo
+    │   ├── prozess/            # ProzessView
+    │   ├── db/                 # DatabaseView
+    │   └── json/               # ItsqTreeView
+    ├── model/base/             # AppConfig, ConfigEntry, ConnectionInfo
+    ├── util/                   # Utilities
+    ├── exception/              # Exceptions
+    └── itsq/                   # ITSQ Explorer
+        ├── design/             # JFD-generierte Panels
+        ├── model/              # ItsqItem Model-Klassen
+        ├── tree/               # TreeNode-Klassen
+        └── view/               # View-Klassen
 ```
 
 ## Package-Struktur
 
 ```
 de.cavdar.gui/
-├── design/                     # GUI-Panels (fuer GUI-Designer)
-│   ├── BaseViewPanel.java      # Abstract Basis fuer View-Panels
-│   ├── MainFrame.java          # Hauptfenster mit MDI
-│   ├── EmbeddablePanel.java    # Abstract fuer einbettbare Panels
-│   ├── SettingsPanel.java      # Einstellungen (links oben)
-│   ├── TreePanel.java          # Tree-Panel (links unten)
-│   ├── DesktopPanel.java       # MDI-Desktop (rechts)
-│   ├── DatabaseViewPanel.java  # DB-View mit SplitPane
-│   ├── CustomerTreeViewPanel.java
-│   ├── EditorPanel.java        # Editor-Wrapper
-│   ├── InternalFrameEditor.java # JFormDesigner Editor
-│   └── ...ViewPanel.java       # Weitere View-Panels
-│
-├── view/                       # View-Logik
-│   ├── ViewInfo.java           # Interface fuer View-Metadaten
-│   ├── BaseView.java           # Abstract, implementiert ViewInfo, hat config-Feld
-│   ├── MainView.java           # Einstiegspunkt mit main()
-│   ├── DatabaseView.java       # DB-Verbindungen, SQL-Ausfuehrung
-│   ├── CustomerTreeView.java   # Checkbox-Tree fuer Kunden (JSON-Dateien)
-│   ├── ItsqTreeView.java       # Tree-View fuer ITSQ-Verzeichnis (Assembly)
-│   ├── EditorView.java         # Text-Editor
-│   ├── SampleView.java
-│   ├── ProzessView.java
-│   ├── AnalyseView.java
-│   └── TreeView.java
-│
-├── model/
-│   ├── AppConfig.java          # Singleton Konfiguration
-│   ├── ConfigEntry.java        # Record fuer Config-Eintraege
-│   ├── ConnectionInfo.java     # DB-Verbindungsdaten
-│   ├── TestCustomer.java       # Kunde mit Szenarien
-│   ├── TestScenario.java       # Szenario mit Testfaellen
-│   └── TestCrefo.java          # Testfall
-│
-├── util/
-│   ├── ConnectionManager.java  # DB-Connection Management
-│   ├── TestDataLoader.java     # JSON Laden/Speichern
-│   ├── IconLoader.java         # PNG-Icons laden
-│   ├── CheckboxTreeCellRenderer.java
-│   └── CheckboxTreeCellEditor.java
-│
-├── exception/
-│   ├── ConfigurationException.java
-│   └── ViewException.java
-│
-└── jfd/                        # JFormDesigner Klassen
-    ├── design/                 # JFD-generierte Panels
-    │   ├── ItsqMainPanel.java      # Hauptpanel mit SplitPane
-    │   ├── ItsqTreePanel.java      # Tree-Panel (links)
-    │   ├── ItsqViewTabPanel.java   # CardLayout (rechts)
-    │   ├── ItsqRootPanel.java
-    │   ├── ItsqArchivBestandPanel.java
-    │   ├── ItsqArchivBestandPhasePanel.java
-    │   ├── ItsqRefExportsPanel.java
-    │   ├── ItsqRefExportsPhasePanel.java
-    │   ├── ItsqCustomerPanel.java
-    │   ├── ItsqScenarioPanel.java
-    │   ├── ItsqXmlPanel.java
-    │   ├── ItsqOptionsPanel.java
-    │   └── ItsqScenarioPropertiesPanel.java
-    │
-    ├── model/                  # Model-Klassen (UserObjects)
-    │   ├── ItsqItem.java           # Basis-Interface
-    │   ├── ItsqRoot.java
-    │   ├── ItsqArchivBestand.java
-    │   ├── ItsqArchivBestandPhase.java
-    │   ├── ItsqRefExports.java
-    │   ├── ItsqRefExportsPhase.java
-    │   ├── ItsqCustomer.java
-    │   ├── ItsqScenario.java
-    │   ├── ItsqXmlFile.java
-    │   ├── ItsqOptionsFile.java
-    │   └── ItsqPropertiesFile.java
-    │
-    ├── tree/                   # TreeNode-Klassen
-    │   ├── ItsqTreeModel.java      # TreeModel mit Factory-Logik
-    │   ├── ItsqTreeNode.java       # Basis-TreeNode
-    │   ├── ItsqRootTreeNode.java
-    │   ├── ItsqArchivBestandTreeNode.java
-    │   ├── ItsqArchivBestandPhaseTreeNode.java
-    │   ├── ItsqRefExportsTreeNode.java
-    │   ├── ItsqRefExportsPhaseTreeNode.java
-    │   ├── ItsqCustomerTreeNode.java
-    │   ├── ItsqScenarioTreeNode.java
-    │   ├── ItsqXmlTreeNode.java
-    │   ├── ItsqOptionsTreeNode.java
-    │   └── ItsqPropertiesTreeNode.java
-    │
-    └── view/                   # View-Klassen
-        ├── ItsqExplorerView.java       # Hauptview (extends BaseView)
-        ├── ItsqItemSelectable.java     # Interface fuer Item-Selektion
-        ├── ItsqPanelTree.java          # extends ItsqTreePanel
-        ├── ItsqViewTabView.java        # extends ItsqViewTabPanel
-        ├── ItsqRootView.java
-        ├── ItsqArchivBestandView.java
-        ├── ItsqArchibBestandPhaseView.java
-        ├── ItsqRefExportsView.java
-        ├── ItsqRefExportsPhaseView.java
-        ├── ItsqCustomerView.java
-        ├── ItsqScenarioView.java
-        ├── ItsqXmlView.java
-        ├── ItsqOptionsView.java
-        └── ItsqScenarioPropertiesView.java
+├── Main.java                   # Einstiegspunkt mit main()
+├── design/
+│   ├── base/                   # BaseViewPanel, MainFrame, DesktopPanel, SettingsPanel
+│   ├── prozess/                # ProzessViewPanel
+│   ├── db/                     # DatabaseViewPanel
+│   └── json/                   # ItsqTreeViewPanel
+├── view/
+│   ├── base/                   # BaseView, ViewInfo
+│   ├── prozess/                # ProzessView
+│   ├── db/                     # DatabaseView
+│   └── json/                   # ItsqTreeView
+├── model/base/                 # AppConfig, ConfigEntry, ConnectionInfo
+├── util/                       # ConnectionManager, IconLoader, TestEnvironmentManager
+├── exception/                  # ConfigurationException
+└── itsq/                       # ITSQ Explorer (JFormDesigner)
+    ├── design/                 # ItsqMainPanel, ItsqTreePanel, etc.
+    ├── model/                  # ItsqItem, ItsqRoot, ItsqCustomer, etc.
+    ├── tree/                   # ItsqTreeModel, ItsqTreeNode, etc.
+    └── view/                   # ItsqExplorerView, ItsqItemSelectable, etc.
 ```
 
 ## Design-View-Trennung Pattern
 
-Jede View besteht aus zwei Klassen:
-
-1. **Panel-Klasse** (`design/`): Nur GUI-Komponenten, kein Logik
+1. **Panel-Klasse** (`design/`): Nur GUI-Komponenten
 2. **View-Klasse** (`view/`): Nur Logik und Event-Handler
-
-```
-BaseView (abstrakt)
-   └── createPanel() → BaseViewPanel
-   └── setupToolbarActions()
-   └── setupListeners()
-
-BaseViewPanel (abstrakt)
-   └── initComponents()
-   └── Toolbar, Content, StatusBar
-```
-
-## ViewInfo Interface
-
-Jede View implementiert:
-
-```java
-public interface ViewInfo {
-    String getMenuLabel();           // Menu-Text
-    String getToolbarLabel();        // Toolbar-Text (null = kein Button)
-    Icon getIcon();                  // Icon fuer Menu/Toolbar
-    KeyStroke getKeyboardShortcut(); // Tastaturkuerzel
-    String getMenuGroup();           // Submenu-Gruppe
-}
-```
 
 ## Registrierte Views
 
-| View | Shortcut | Menu-Gruppe | Icon |
-|------|----------|-------------|------|
-| SampleView | Ctrl+1 | Analyse | client.png |
-| ProzessView | Ctrl+2 | Verwaltung | gear_run.png |
-| AnalyseView | Ctrl+3 | Analyse | table_sql.png |
-| TreeView | Ctrl+4 | Navigation | folder_view.png |
-| CustomerTreeView | Ctrl+5 | Verwaltung | folder_cubes.png |
-| EditorView | Ctrl+E | Views | folder_edit.png |
-| ItsqTreeView | Ctrl+I | Verwaltung | folder_cubes.png |
-| ItsqExplorerView | Ctrl+J | Verwaltung | folder_cubes.png |
-
-## Maven-Artefakt-Integration
-
-Das Projekt integriert externe Artefakte (z.B. `testfaelle`) via maven-dependency-plugin:
-
-```xml
-<!-- Properties -->
-<testfaelle.groupId>testfaelle</testfaelle.groupId>
-<testfaelle.artifactId>itsq</testfaelle.artifactId>
-<testfaelle.classifier>distribution-${testfaelle.branch}</testfaelle.classifier>
-<testfaelle.type>zip</testfaelle.type>
-
-<!-- Profiles -->
-<profile id="snapshot"> <!-- Standard -->
-    <testfaelle.version>1.1.0-SNAPSHOT</testfaelle.version>
-    <testfaelle.branch>TEST-01</testfaelle.branch>
-</profile>
-<profile id="release">
-    <testfaelle.version>1.1.0</testfaelle.version>
-    <testfaelle.branch>TEST-01</testfaelle.branch>
-</profile>
-```
-
-**Build-Kommandos:**
-```bash
-mvn package              # SNAPSHOT
-mvn package -Prelease    # Release
-```
-
-## Distribution-Struktur
-
-Nach `mvn package`:
-
-```
-target/TemplateGUI-1.0.0-SNAPSHOT-distribution.zip
-└── TemplateGUI-1.0.0-SNAPSHOT/
-    ├── config.properties
-    ├── log4j.properties
-    ├── startGUI.cmd
-    ├── lib/                # Alle JARs
-    │   ├── TemplateGUI-1.0.0-SNAPSHOT.jar
-    │   ├── postgresql-42.7.4.jar
-    │   ├── jackson-*.jar
-    │   └── slf4j-*.jar
-    └── ITSQ/               # Testfaelle-Artefakt
-        ├── ARCHIV-BESTAND/
-        └── REF-EXPORTS/
-```
-
-## Docker-Setup
-
-```yaml
-# docker-compose.yml
-services:
-  postgres:
-    image: postgres:15-alpine
-    ports: ["5432:5432"]
-    environment:
-      POSTGRES_DB: templatedb
-      POSTGRES_USER: template
-      POSTGRES_PASSWORD: template123
-```
-
-**Starten:**
-```bash
-cd docker
-docker-compose up -d postgres
-```
-
-## Konfiguration (config.properties)
-
-| Gruppe | Keys |
-|--------|------|
-| WINDOW | LAST_WINDOW_*, LAST_*_SPLIT_DIVIDER |
-| LATEST | LAST_DB_CONNECTION, LAST_TEST_*, CUSTOMER_FILE_HISTORY |
-| FLAGS | DUMP_IN_REST_CLIENT, SFTP_UPLOAD_ACTIVE, ... |
-| DATABASE | DB_CONNECTIONS, SQL_HISTORY, SQL_FAVORITES |
-| TESTS | TEST-SOURCES, TEST-TYPES, ITSQ_REVISIONS |
+| View | Shortcut | Icon |
+|------|----------|------|
+| ProzessView | Ctrl+2 | gear_run.png |
+| ItsqTreeView | Ctrl+I | folder_cubes.png |
+| ItsqExplorerView | Ctrl+J | folder_cubes.png |
 
 ## Abhaengigkeiten
 
@@ -329,59 +106,15 @@ docker-compose up -d postgres
 |------------|---------|-------|
 | log4j | 1.2.12 | Logging |
 | slf4j-api | 2.0.9 | Logging Facade |
-| slf4j-reload4j | 2.0.6 | SLF4J Binding |
 | postgresql | 42.7.4 | JDBC Driver |
 | jackson-databind | 2.17.0 | JSON Parsing |
-
-## Lokale Umgebung
-
-- **Java:** 17+
-- **Maven:** 3.6+
-- **Docker:** Optional fuer PostgreSQL
-
-## Typisiertes Tree-Model
-
-Das ITSQ Tree-Model verwendet typisierte Klassen statt generischer Nodes:
-
-```
-ItsqItem (Interface)
-   ├── ItsqRoot
-   ├── ItsqArchivBestand
-   ├── ItsqArchivBestandPhase
-   ├── ItsqRefExports
-   ├── ItsqRefExportsPhase
-   ├── ItsqCustomer
-   ├── ItsqScenario
-   ├── ItsqXmlFile
-   ├── ItsqOptionsFile
-   └── ItsqPropertiesFile
-
-ItsqTreeNode (extends DefaultMutableTreeNode)
-   ├── ItsqRootTreeNode
-   ├── ItsqArchivBestandTreeNode
-   ├── ... (je ein Node pro Model-Klasse)
-```
-
-**Vorteile:**
-- Typsicherheit durch `instanceof`-Checks
-- Zugriff auf spezifische Properties (z.B. `customer.getCustomerId()`)
-- Erweiterbar fuer neue Node-Typen
-
-## Offene Punkte (Stand 04.01.2026)
-
-- Die View-Klassen (ItsqRootView, ItsqCustomerView, etc.) implementieren `ItsqItemSelectable`
-- Views koennen mit Logik befuellt werden um den `ItsqItem` anzuzeigen/bearbeiten
+| junit-jupiter | 5.10.2 | Unit Tests |
+| assertj-swing | 3.17.1 | GUI Tests |
 
 ## Prompt zum Fortsetzen
 
 ```
 Ich arbeite am Java-Projekt TemplateGUI unter E:\Projekte\ClaudeCode\TemplateGUI.
 Bitte lies die Datei docs/CLAUDE_CONTEXT.md fuer den Kontext.
-
-Stand: ItsqExplorerView mit typisiertem Tree-Model ist implementiert.
-- ItsqTreeModel mit Factory-Logik fuer Node-Erstellung
-- Typisierte Nodes (ItsqCustomerTreeNode, ItsqScenarioTreeNode, etc.)
-- Views erhalten ItsqItem via ItsqItemSelectable Interface
-
 Bitte lies todo.txt fuer aktuelle Aufgaben.
 ```

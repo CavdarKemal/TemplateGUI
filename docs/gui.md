@@ -83,7 +83,7 @@ de.cavdar.gui
 └── view/                            # Business-Logik
     ├── ViewInfo.java                # Interface fuer View-Metadaten
     ├── BaseView.java                # Abstrakte View-Basisklasse (mit config-Feld)
-    ├── MainView.java                # Einstiegspunkt mit main()
+    ├── Main.java                # Einstiegspunkt mit main()
     ├── DatabaseView.java            # Datenbank-View mit SQL-Editor
     ├── CustomerTreeView.java        # Checkbox-Tree fuer Kunden (JSON)
     ├── ItsqTreeView.java            # Tree fuer ITSQ-Verzeichnis
@@ -143,7 +143,7 @@ public abstract class BaseView extends JInternalFrame implements ViewInfo {
 }
 ```
 
-### MainView
+### Main
 
 Hauptanwendungsklasse mit MDI-Desktop-Management.
 
@@ -250,7 +250,7 @@ public class MyViewView extends BaseView {
 
 ### Schritt 4: View registrieren (optional)
 
-In `MainView.registerDefaultViews()`:
+In `Main.registerDefaultViews()`:
 
 ```java
 private void registerDefaultViews() {
@@ -329,7 +329,7 @@ private void processData() {
 
 ### Aus IDE (IntelliJ)
 
-Main-Klasse: `de.cavdar.gui.view.MainView`
+Main-Klasse: `de.cavdar.gui.Main`
 
 ### Aus Distribution
 
