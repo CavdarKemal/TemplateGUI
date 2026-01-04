@@ -51,9 +51,14 @@ public class ItsqExplorerView extends BaseView {
     private static final String CARD_CUSTOMER = "cardCustomer";
     private static final String CARD_XML = "cardXml";
 
+    private static final String TESTSET_HISTORY_KEY = "itsq.testset.history";
+    private static final int MAX_HISTORY = 20;
+
     private ItsqMainPanel mainPanel;
     private final AppConfig cfg = AppConfig.getInstance();
     private ItsqTreeModel treeModel;
+    private DefaultComboBoxModel<String> testSetHistoryModel;
+    private boolean updatingComboBox = false;
 
     public ItsqExplorerView() {
         super("ITSQ Explorer (JFD)");
@@ -62,6 +67,9 @@ public class ItsqExplorerView extends BaseView {
         // Initialize empty tree model
         treeModel = new ItsqTreeModel(null);
         getTree().setModel(treeModel);
+
+        // Initialize TestSet ComboBox with history
+        initTestSetComboBox();
 
         // Load initial data
         SwingUtilities.invokeLater(this::loadItsqDirectory);
@@ -86,15 +94,129 @@ public class ItsqExplorerView extends BaseView {
         // Load button
         mainPanel.getButtonLoad().addActionListener(e -> browseItsqPath());
 
-        // Save button (placeholder)
-        mainPanel.getButtonSave().addActionListener(e ->
-                JOptionPane.showMessageDialog(this, "Save nicht implementiert"));
-
-        // Refresh button
-        mainPanel.getButtonRefresh().addActionListener(e -> loadItsqDirectory());
+        // ComboBox selection change -> reload tree
+        mainPanel.getComboBoxTestSet().addActionListener(e -> onTestSetSelectionChanged());
 
         // Tree selection -> switch card
         getTree().addTreeSelectionListener(this::onTreeSelectionChanged);
+    }
+
+    /**
+     * Initializes the TestSet ComboBox with history model.
+     */
+    @SuppressWarnings("unchecked")
+    private void initTestSetComboBox() {
+        testSetHistoryModel = new DefaultComboBoxModel<>();
+        JComboBox<String> comboBox = mainPanel.getComboBoxTestSet();
+        comboBox.setModel(testSetHistoryModel);
+        comboBox.setEditable(true);
+
+        // Load history from config
+        loadTestSetHistory();
+
+        // Handle Enter in the editor
+        JTextField editor = (JTextField) comboBox.getEditor().getEditorComponent();
+        editor.addActionListener(e -> {
+            String path = editor.getText().trim();
+            if (!path.isEmpty()) {
+                loadTestSetPath(path);
+            }
+        });
+    }
+
+    /**
+     * Loads TestSet history from config.
+     */
+    private void loadTestSetHistory() {
+        String history = cfg.getProperty(TESTSET_HISTORY_KEY);
+        if (history != null && !history.isEmpty()) {
+            String[] paths = history.split("\\|");
+            for (String path : paths) {
+                if (!path.isEmpty()) {
+                    testSetHistoryModel.addElement(path);
+                }
+            }
+        }
+    }
+
+    /**
+     * Saves TestSet history to config.
+     */
+    private void saveTestSetHistory() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < testSetHistoryModel.getSize(); i++) {
+            if (i > 0) sb.append("|");
+            sb.append(testSetHistoryModel.getElementAt(i));
+        }
+        cfg.setProperty(TESTSET_HISTORY_KEY, sb.toString());
+        cfg.save();
+    }
+
+    /**
+     * Adds a path to the TestSet history (at top, no duplicates).
+     */
+    private void addToTestSetHistory(String path) {
+        if (path == null || path.isEmpty()) {
+            return;
+        }
+
+        updatingComboBox = true;
+        try {
+            // Remove if already exists
+            testSetHistoryModel.removeElement(path);
+
+            // Add at beginning
+            testSetHistoryModel.insertElementAt(path, 0);
+
+            // Limit size
+            while (testSetHistoryModel.getSize() > MAX_HISTORY) {
+                testSetHistoryModel.removeElementAt(testSetHistoryModel.getSize() - 1);
+            }
+
+            // Select the new item
+            testSetHistoryModel.setSelectedItem(path);
+
+            // Save to config
+            saveTestSetHistory();
+        } finally {
+            updatingComboBox = false;
+        }
+    }
+
+    /**
+     * Called when TestSet ComboBox selection changes.
+     */
+    private void onTestSetSelectionChanged() {
+        if (updatingComboBox) {
+            return;
+        }
+
+        Object selected = mainPanel.getComboBoxTestSet().getSelectedItem();
+        if (selected != null) {
+            String path = selected.toString().trim();
+            if (!path.isEmpty()) {
+                loadTestSetPath(path);
+            }
+        }
+    }
+
+    /**
+     * Loads the specified TestSet path.
+     */
+    private void loadTestSetPath(String path) {
+        File dir = new File(path);
+        if (dir.exists() && dir.isDirectory()) {
+            // Update config
+            cfg.setProperty(ITSQ_PATH_KEY, path);
+            cfg.save();
+
+            // Reload
+            loadItsqDirectory();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Verzeichnis nicht gefunden: " + path,
+                    "Fehler", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // ===== ViewInfo Implementation =====
@@ -145,6 +267,9 @@ public class ItsqExplorerView extends BaseView {
 
         // Show root card
         showCard(CARD_ROOT, null);
+
+        // Add to history
+        addToTestSetHistory(itsqDir.getAbsolutePath());
 
         LOG.info("Loaded ITSQ directory: {} ({} files, {} dirs)",
                 itsqDir.getAbsolutePath(), treeModel.getTotalFiles(), treeModel.getTotalDirs());
