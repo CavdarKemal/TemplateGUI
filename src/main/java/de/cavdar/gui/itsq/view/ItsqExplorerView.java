@@ -109,6 +109,20 @@ public class ItsqExplorerView extends BaseView {
         // ComboBox selection change -> reload tree
         mainPanel.getComboBoxTestSet().addActionListener(e -> onTestSetSelectionChanged());
 
+        // Filter ComboBox -> apply filter on tree
+        mainPanel.getComboBoxFilter().addActionListener(e -> applyFilter());
+        JTextField filterEditor = (JTextField) mainPanel.getComboBoxFilter().getEditor().getEditorComponent();
+        filterEditor.addActionListener(e -> applyFilter());
+
+        // Active Only checkbox -> apply filter on tree
+        mainPanel.getCheckBoxActiveOnly().addActionListener(e -> applyFilter());
+
+        // Source filter (Quelle) -> apply filter on tree
+        mainPanel.getComboBoxSource().addActionListener(e -> applyFilter());
+
+        // Phase filter -> apply filter on tree
+        mainPanel.getComboBoxPhase().addActionListener(e -> applyFilter());
+
         // Tree selection -> switch card
         getTree().addTreeSelectionListener(this::onTreeSelectionChanged);
     }
@@ -295,8 +309,14 @@ public class ItsqExplorerView extends BaseView {
             return;
         }
 
-        // Reload tree model
-        treeModel.reload(itsqDir);
+        // Get filter settings
+        String filterText = getFilterText();
+        boolean activeOnly = mainPanel.getCheckBoxActiveOnly().isSelected();
+        String sourceFilter = (String) mainPanel.getComboBoxSource().getSelectedItem();
+        String phaseFilter = (String) mainPanel.getComboBoxPhase().getSelectedItem();
+
+        // Reload tree model with all filters
+        treeModel.reload(itsqDir, filterText, activeOnly, sourceFilter, phaseFilter);
 
         // Expand tree to level 2
         expandToLevel(getTree(), 2);
@@ -309,8 +329,55 @@ public class ItsqExplorerView extends BaseView {
         addToTestSetHistory(path);
         lastValidSelection = path;
 
-        LOG.info("Loaded ITSQ directory: {} ({} files, {} dirs)",
-                path, treeModel.getTotalFiles(), treeModel.getTotalDirs());
+        // Add filter to history if not empty
+        addToFilterHistory(filterText);
+
+        LOG.info("Loaded ITSQ directory: {} ({} files, {} dirs, filter: '{}', source: '{}', phase: '{}', activeOnly: {})",
+                path, treeModel.getTotalFiles(), treeModel.getTotalDirs(), filterText, sourceFilter, phaseFilter, activeOnly);
+    }
+
+    /**
+     * Gets the current filter text from the filter ComboBox.
+     */
+    private String getFilterText() {
+        Object selected = mainPanel.getComboBoxFilter().getSelectedItem();
+        return selected != null ? selected.toString().trim() : "";
+    }
+
+    /**
+     * Applies the current filter settings to reload the tree.
+     */
+    private void applyFilter() {
+        if (updatingComboBox || !initialLoadDone) {
+            return;
+        }
+        loadItsqDirectory();
+    }
+
+    /**
+     * Adds a filter text to the filter history (if not empty and not already present).
+     */
+    @SuppressWarnings("unchecked")
+    private void addToFilterHistory(String filterText) {
+        if (filterText == null || filterText.isEmpty()) {
+            return;
+        }
+
+        JComboBox<String> filterCombo = mainPanel.getComboBoxFilter();
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) filterCombo.getModel();
+
+        // Check if already exists
+        for (int i = 0; i < model.getSize(); i++) {
+            if (filterText.equals(model.getElementAt(i))) {
+                return;
+            }
+        }
+
+        // Add to model (limit to 20 entries)
+        model.insertElementAt(filterText, 0);
+        if (model.getSize() > 20) {
+            model.removeElementAt(model.getSize() - 1);
+        }
     }
 
     private File resolveItsqPath() {

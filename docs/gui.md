@@ -475,6 +475,52 @@ SQL_FAVORITES=SELECT * FROM products WHERE active=true
 | H2 | org.h2.Driver |
 | SQLite | org.sqlite.JDBC |
 
+## ItsqExplorerView (ITSQ-TestSet Verwaltung)
+
+Die ItsqExplorerView bietet eine Verwaltungsoberfläche für ITSQ-Testsets mit umfangreichen Filterfunktionen.
+
+### Features
+
+- **TestSet-Auswahl**: ComboBox mit Historie der zuletzt verwendeten Verzeichnisse
+- **Mehrfache Filter**: Kombinierbare Filter für präzise Suche
+- **Tree-Ansicht**: Hierarchische Darstellung der ITSQ-Verzeichnisstruktur
+- **Detail-Views**: Kontextabhängige Detailansichten per CardLayout
+
+### Filter-Funktionen
+
+| Filter | Beschreibung | Werte |
+|--------|--------------|-------|
+| **Text-Filter** | Sucht nach Datei-/Ordnernamen (case-insensitive) | Freie Eingabe |
+| **Quelle** | Filtert nach Hauptverzeichnis | Alle, ARCHIV-BESTAND, REF-EXPORTS |
+| **Phase** | Filtert nach Phase-Unterverzeichnis | Alle, PHASE-1, PHASE-2 |
+| **Active Only** | Zeigt nur aktive Elemente | Checkbox |
+
+### Verzeichnisstruktur
+
+```
+ITSQ/
+├── ARCHIV-BESTAND/
+│   ├── PHASE-1/
+│   │   └── *.xml
+│   └── PHASE-2/
+│       └── *.xml
+└── REF-EXPORTS/
+    ├── PHASE-1/
+    │   └── c0x/ (Customer)
+    │       ├── Options.cfg
+    │       └── Relevanz-xyz/ (Scenario)
+    │           ├── *.xml
+    │           └── *.properties
+    └── PHASE-2/
+        └── ...
+```
+
+### Tastenkürzel
+
+| Shortcut | Funktion |
+|----------|----------|
+| Ctrl+J | ItsqExplorerView öffnen |
+
 ## SettingsPanel
 
 Das SettingsPanel wird links im Hauptfenster angezeigt und bietet schnellen Zugriff auf:
