@@ -1,7 +1,7 @@
 package de.cavdar.gui;
 
 import de.cavdar.gui.design.base.MainFrame;
-import de.cavdar.gui.itsq.view.ItsqExplorerView;
+import de.cavdar.gui.view.itsq.ItsqExplorerView;
 import de.cavdar.gui.view.json.ItsqTreeView;
 import de.cavdar.gui.view.prozess.ProzessView;
 import org.slf4j.Logger;

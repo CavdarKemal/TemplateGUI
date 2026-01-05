@@ -1,6 +1,6 @@
 package de.cavdar.gui.design;
 
-import de.cavdar.gui.itsq.view.ItsqExplorerView;
+import de.cavdar.gui.view.itsq.ItsqExplorerView;
 import de.cavdar.gui.design.base.MainFrame;
 import de.cavdar.gui.util.TestEnvironmentManager;
 import de.cavdar.gui.view.json.ItsqTreeView;

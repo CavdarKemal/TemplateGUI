@@ -1,6 +1,7 @@
-package de.cavdar.gui.itsq.view;
+package de.cavdar.gui.view.itsq;
 
 import de.cavdar.gui.design.base.BaseViewPanel;
+import de.cavdar.gui.itsq.view.ItsqMainView;
 import de.cavdar.gui.model.base.AppConfig;
 import de.cavdar.gui.view.base.BaseView;
 import org.slf4j.Logger;

@@ -150,7 +150,7 @@ new FormModel {
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
-				add( new FormComponent( "de.cavdar.gui.itsq.view.ItsqPanelTree" ) {
+				add( new FormComponent( "de.cavdar.gui.itsq.view.ItsqTreeView" ) {
 					name: "panelItsqTree"
 					"border": #EtchedBorder0
 					auxiliary() {
