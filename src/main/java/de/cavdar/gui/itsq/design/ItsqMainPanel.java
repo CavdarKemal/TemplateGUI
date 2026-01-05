@@ -61,7 +61,7 @@ public class ItsqMainPanel extends JPanel {
         return checkBoxActiveOnly;
     }
 
-    public ItsqPanelTree getPanelItsqTree() {
+    public ItsqTreeView getPanelItsqTree() {
         return panelItsqTree;
     }
 
@@ -87,7 +87,7 @@ public class ItsqMainPanel extends JPanel {
         comboBoxFilter = new JComboBox();
         checkBoxActiveOnly = new JCheckBox();
         splitPaneItsq = new JSplitPane();
-        panelItsqTree = new ItsqPanelTree();
+        panelItsqTree = new ItsqTreeView();
         panelItsqView = new ItsqViewTabView();
 
         //======== this ========
@@ -199,7 +199,7 @@ public class ItsqMainPanel extends JPanel {
     private JComboBox comboBoxFilter;
     private JCheckBox checkBoxActiveOnly;
     private JSplitPane splitPaneItsq;
-    private ItsqPanelTree panelItsqTree;
+    private ItsqTreeView panelItsqTree;
     private ItsqViewTabView panelItsqView;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }
