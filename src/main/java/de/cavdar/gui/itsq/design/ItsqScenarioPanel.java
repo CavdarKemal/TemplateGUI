@@ -22,10 +22,8 @@ public class ItsqScenarioPanel extends JPanel {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        ResourceBundle bundle = ResourceBundle.getBundle("de.cavdar.gui.design.form");
         panelControls = new JPanel();
         labelTitle = new JLabel();
-        button2 = new JButton();
 
         //======== this ========
         setLayout(new BorderLayout());
@@ -44,12 +42,6 @@ public class ItsqScenarioPanel extends JPanel {
             panelControls.add(labelTitle, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(0, 0, 0, 5), 0, 0));
-
-            //---- button2 ----
-            button2.setText(bundle.getString("ItsqRefExportsPanel.button2.text"));
-            panelControls.add(button2, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                new Insets(0, 0, 0, 0), 0, 0));
         }
         add(panelControls, BorderLayout.NORTH);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
@@ -58,6 +50,5 @@ public class ItsqScenarioPanel extends JPanel {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JPanel panelControls;
     private JLabel labelTitle;
-    private JButton button2;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

@@ -26,12 +26,6 @@ new FormModel {
 					"text": "SCENARIO  View"
 					"font": new java.awt.Font( "Segoe UI", 0, 24 )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button2"
-					"text": new FormMessage( null, "ItsqRefExportsPanel.button2.text" )
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-					"gridx": 4
-				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "North"
 			} )

@@ -9,8 +9,9 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
+			"border": new javax.swing.border.SoftBevelBorder( 1, null, null, null, null )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
-				"$columnSpecs": "0, 0, 0, 0, 0"
+				"$columnSpecs": "0"
 				"$rowSpecs": "0"
 				"$hGap": 5
 				"$vGap": 5
@@ -23,17 +24,27 @@ new FormModel {
 				}
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "labelTitle"
-					"text": "CUSTOMER  View"
+					"text": "CUSTOMER  #"
 					"font": new java.awt.Font( "Segoe UI", 0, 24 )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button2"
-					"text": new FormMessage( null, "ItsqRefExportsPanel.button2.text" )
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-					"gridx": 4
-				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "North"
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0, 0:1.0"
+				"$rowSpecs": "0, 27"
+				"$hGap": 5
+				"$vGap": 5
+				"$alignLeft": true
+				"$alignTop": true
+			} ) {
+				name: "panelView"
+				"border": new javax.swing.border.EtchedBorder( 1, null, null )
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

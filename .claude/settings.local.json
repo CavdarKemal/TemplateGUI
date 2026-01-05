@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(mvn test:*)",
-      "Bash(mvn:*)"
+      "Bash(mvn:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nFeature: Filter-Funktionalität für ItsqExplorerView\n\nImplementiert kombinierte Filter wie im JSON-Explorer:\n- Text-Filter: Suche nach Datei-/Ordnernamen \\(case-insensitive\\)\n- Quelle-Filter: ARCHIV-BESTAND, REF-EXPORTS oder Alle\n- Phase-Filter: PHASE-1, PHASE-2 oder Alle\n- Active Only Checkbox \\(Platzhalter\\)\n\nÄnderungen:\n- ItsqMainPanel: Neue ComboBoxen für Quelle und Phase\n- ItsqTreeModel: Erweiterte reload\\(\\) mit Filterparametern\n- ItsqExplorerView: Listener für alle Filter-Komponenten\n- Dokumentation: Neuer Abschnitt für ItsqExplorerView\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }

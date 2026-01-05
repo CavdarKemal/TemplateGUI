@@ -94,13 +94,13 @@ new FormModel {
 			add( new FormContainer( "javax.swing.JSplitPane", new FormLayoutManager( class javax.swing.JSplitPane ) ) {
 				name: "splitPaneItsq"
 				"dividerLocation": 120
-				add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqPanelTree" ) {
+				add( new FormComponent( "de.cavdar.gui.itsq.view.ItsqPanelTree" ) {
 					name: "panelItsqTree"
 					"border": #EtchedBorder0
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "left"
 				} )
-				add( new FormComponent( "de.cavdar.gui.jfd.view.ItsqViewTabView" ) {
+				add( new FormComponent( "de.cavdar.gui.itsq.view.ItsqViewTabView" ) {
 					name: "panelItsqView"
 					"border": #EtchedBorder0
 				}, new FormLayoutConstraints( class java.lang.String ) {
