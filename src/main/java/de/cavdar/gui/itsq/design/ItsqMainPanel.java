@@ -169,7 +169,7 @@ public class ItsqMainPanel extends JPanel {
 
         //======== splitPaneItsq ========
         {
-            splitPaneItsq.setDividerLocation(120);
+            splitPaneItsq.setDividerLocation(200);
 
             //---- panelItsqTree ----
             panelItsqTree.setBorder(new EtchedBorder());
