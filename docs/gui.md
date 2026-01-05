@@ -574,6 +574,56 @@ Das Panel reagiert automatisch auf Aenderungen der Verbindungsliste (Observer Pa
 - Buttons zum Oeffnen der registrierten Views
 - Dynamisch basierend auf `registerView()` Aufrufen
 
+## ItsqEditorView (Datei-Editor)
+
+Die ItsqEditorView ist ein Dual-Modus-Editor, der je nach Dateityp unterschiedliche Bearbeitungsmodi bietet.
+
+### Modi
+
+| Dateityp | Modus | Beschreibung |
+|----------|-------|--------------|
+| `.xml` | XML-Editor | RSyntaxTextArea mit Syntax-Highlighting |
+| `.cfg`, `.properties` | Tabellen-Editor | JTable mit Name/Wert-Spalten |
+
+### XML-Modus Features
+
+- **Syntax-Highlighting** fuer XML
+- **Zeilennummern** und **Code-Folding**
+- **Suche**: Strg+F fokussiert Filter, F3 = weiter, Shift+F3 = zurueck
+- **Gehe zu Zeile**: Strg+G
+- **Speichern**: Strg+S
+
+### Properties-Modus Features
+
+- **Tabellen-Editor** mit Spalten "Name" und "Wert"
+- **CRUD-Buttons** in der Toolbar:
+  - **Neu**: Neuen Eintrag hinzufuegen
+  - **Aendern**: Ausgewaehlten Eintrag bearbeiten (auch per Doppelklick)
+  - **Loeschen**: Ausgewaehlten Eintrag entfernen
+- **Live-Filter**: Filtert sofort nach Name oder Wert
+- **Kommentar-Erhaltung**: Zeilen mit `#` oder `!` bleiben beim Speichern erhalten
+
+### Toolbar
+
+```
+[Neu] [Aendern] [Loeschen] | Filter: [ComboBox] | [Speichern] ... [Status]
+```
+
+- Buttons "Neu/Aendern/Loeschen" sind nur im Properties-Modus aktiv
+- Filter-ComboBox dient als Suche (XML) oder Filter (Properties)
+- Status-Label zeigt Lade-/Speicher-Meldungen
+
+### Technische Implementierung
+
+```
+ItsqEditorPanel (JFormDesigner)
+└── ItsqEditorView (View-Logik)
+    ├── CardLayout fuer Modus-Wechsel
+    ├── RSyntaxTextArea fuer XML
+    ├── JTable + PropertiesTableModel fuer Properties
+    └── updateToolbarForMode() fuer Button-Aktivierung
+```
+
 ## Konfigurationsdatei (config.properties)
 
 ```properties

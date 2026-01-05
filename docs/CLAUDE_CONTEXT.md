@@ -21,6 +21,18 @@
 
 ## Letzte Aenderungen
 
+**05.01.2026** - ItsqEditorView Dual-Modus:
+- **XML-Modus**: RSyntaxTextArea mit Syntax-Highlighting, Suche (F3/Shift+F3)
+- **Properties-Modus**: Tabellen-Editor mit Name/Wert-Spalten, CRUD-Buttons
+- **ItsqEditorPanel**: JFormDesigner-Toolbar mit Neu/Aendern/Loeschen/Filter/Speichern
+- **CardLayout**: Automatischer Modus-Wechsel basierend auf Dateityp (.xml vs .cfg/.properties)
+- **PropertiesTableModel**: Innere Klasse mit Filter und Kommentar-Erhaltung
+
+**05.01.2026** - Itsq-Panels und Views ueberarbeitet:
+- **ItsqArchivBestandPhasePanel/View**: Aktualisiert
+- **ItsqCustomerPanel/View**: Aktualisiert
+- **ItsqRefExportsPhasePanel/View**: Aktualisiert
+
 **04.01.2026** - Package-Refactoring:
 - **Main.java** nach `de.cavdar.gui` verschoben (vorher MainView.java in view/)
 - **Package `jfd` umbenannt zu `itsq`**: Bessere Namenskonvention
@@ -115,6 +127,16 @@ de.cavdar.gui/
 
 ```
 Ich arbeite am Java-Projekt TemplateGUI unter E:\Projekte\ClaudeCode\TemplateGUI.
-Bitte lies die Datei docs/CLAUDE_CONTEXT.md fuer den Kontext.
-Bitte lies todo.txt fuer aktuelle Aufgaben.
+Bitte lies docs/CLAUDE_CONTEXT.md und docs/gui.md fuer den Kontext.
+
+Aktueller Stand (05.01.2026):
+- ItsqEditorView mit Dual-Modus (XML/Properties) fertig
+- ItsqEditorPanel Toolbar via JFormDesigner (Neu/Aendern/Loeschen/Filter/Speichern)
+- CardLayout wechselt automatisch je nach Dateityp
+- PropertiesTableModel mit Filter und Kommentar-Erhaltung
+
+Naechste moegliche Aufgaben:
+- GUI testen und Feintuning
+- Weitere Views ueberarbeiten
+- Neue Features implementieren
 ```
