@@ -13,6 +13,7 @@ public class ItsqScenarioView extends ItsqScenarioPanel implements ItsqItemSelec
     @Override
     public void setSelectedItem(ItsqItem item) {
         this.selectedItem = item;
+        getLabelTitle().setText("SCENARIO " + selectedItem.getName());
     }
 
     public ItsqItem getSelectedItem() {

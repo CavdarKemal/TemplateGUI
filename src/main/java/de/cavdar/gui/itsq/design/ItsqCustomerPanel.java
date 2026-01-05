@@ -25,6 +25,10 @@ public class ItsqCustomerPanel extends JPanel {
         return panelView;
     }
 
+    public JLabel getLabelTitle() {
+        return labelTitle;
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         panelControls = new JPanel();
@@ -37,6 +41,7 @@ public class ItsqCustomerPanel extends JPanel {
 
         //======== panelControls ========
         {
+            panelControls.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
             panelControls.setLayout(new GridBagLayout());
             ((GridBagLayout)panelControls.getLayout()).columnWidths = new int[] {0, 0};
             ((GridBagLayout)panelControls.getLayout()).rowHeights = new int[] {0, 0};
@@ -44,7 +49,7 @@ public class ItsqCustomerPanel extends JPanel {
             ((GridBagLayout)panelControls.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
             //---- labelTitle ----
-            labelTitle.setText("CUSTOMER  #");
+            labelTitle.setText("Kunde  #");
             labelTitle.setFont(new Font("Segoe UI", Font.PLAIN, 24));
             panelControls.add(labelTitle, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,

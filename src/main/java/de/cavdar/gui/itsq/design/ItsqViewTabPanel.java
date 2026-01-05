@@ -71,6 +71,9 @@ public class ItsqViewTabPanel extends JPanel {
         //======== this ========
         setBorder(new EtchedBorder());
         setLayout(new CardLayout());
+
+        //---- panelRoot ----
+        panelRoot.setBorder(new EtchedBorder());
         add(panelRoot, "cardItsqRoot");
         add(panelArchivBestand, "cardArchivBestand");
         add(panelArchivBestandPhase, "cardArchivBestandPhase");

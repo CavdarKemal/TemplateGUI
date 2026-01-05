@@ -13,6 +13,7 @@ public class ItsqCustomerView extends ItsqCustomerPanel implements ItsqItemSelec
     @Override
     public void setSelectedItem(ItsqItem item) {
         this.selectedItem = item;
+        getLabelTitle().setText("Kunde " + selectedItem.getName());
     }
 
     public ItsqItem getSelectedItem() {

@@ -26,6 +26,9 @@ new FormModel {
 					name: "labelTitle"
 					"text": "REF-EXPORTS Phase #"
 					"font": new java.awt.Font( "Segoe UI", 0, 24 )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "North"

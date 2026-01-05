@@ -95,7 +95,7 @@ public class ItsqMainPanel extends JPanel {
 
         //======== panelControls ========
         {
-            panelControls.setBorder(new EtchedBorder());
+            panelControls.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
             panelControls.setLayout(new GridBagLayout());
             ((GridBagLayout)panelControls.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
             ((GridBagLayout)panelControls.getLayout()).rowHeights = new int[] {0, 0, 0};

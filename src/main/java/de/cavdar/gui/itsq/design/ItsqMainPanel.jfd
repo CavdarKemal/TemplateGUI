@@ -21,7 +21,7 @@ new FormModel {
 				"$alignLeft": true
 			} ) {
 				name: "panelControls"
-				"border": &EtchedBorder0 new javax.swing.border.EtchedBorder( 1, null, null )
+				"border": new javax.swing.border.SoftBevelBorder( 1, null, null, null, null )
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
@@ -152,7 +152,7 @@ new FormModel {
 				}
 				add( new FormComponent( "de.cavdar.gui.itsq.view.ItsqTreeView" ) {
 					name: "panelItsqTree"
-					"border": #EtchedBorder0
+					"border": &EtchedBorder0 new javax.swing.border.EtchedBorder( 1, null, null )
 					auxiliary() {
 						"JavaCodeGenerator.variableGetter": true
 					}

@@ -24,6 +24,10 @@ public class ItsqRefExportsPhasePanel extends JPanel {
         return panelView;
     }
 
+    public JLabel getLabelTitle() {
+        return labelTitle;
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         panelControls = new JPanel();

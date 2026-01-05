@@ -13,6 +13,7 @@ public class ItsqArchibBestandPhaseView extends ItsqArchivBestandPhasePanel impl
     @Override
     public void setSelectedItem(ItsqItem item) {
         this.selectedItem = item;
+        getLabelTitle().setText("ARCHIV-BESTAND " + selectedItem.getName());
     }
 
     public ItsqItem getSelectedItem() {

@@ -13,6 +13,7 @@ public class ItsqRefExportsPhaseView extends ItsqRefExportsPhasePanel implements
     @Override
     public void setSelectedItem(ItsqItem item) {
         this.selectedItem = item;
+        getLabelTitle().setText("REF-EXPORTS " + selectedItem.getName());
     }
 
     public ItsqItem getSelectedItem() {

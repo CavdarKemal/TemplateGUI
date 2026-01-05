@@ -24,6 +24,10 @@ public class ItsqArchivBestandPhasePanel extends JPanel {
         return panelView;
     }
 
+    public JLabel getLabelTitle() {
+        return labelTitle;
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         panelControls = new JPanel();
@@ -35,6 +39,7 @@ public class ItsqArchivBestandPhasePanel extends JPanel {
 
         //======== panelControls ========
         {
+            panelControls.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
             panelControls.setLayout(new GridBagLayout());
             ((GridBagLayout)panelControls.getLayout()).columnWidths = new int[] {0, 0};
             ((GridBagLayout)panelControls.getLayout()).rowHeights = new int[] {0, 0};

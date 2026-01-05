@@ -19,13 +19,17 @@ new FormModel {
 				"$alignTop": true
 			} ) {
 				name: "panelControls"
+				"border": new javax.swing.border.SoftBevelBorder( 1, null, null, null, null )
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "labelTitle"
-					"text": "CUSTOMER  #"
+					"text": "Kunde  #"
 					"font": new java.awt.Font( "Segoe UI", 0, 24 )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "North"
