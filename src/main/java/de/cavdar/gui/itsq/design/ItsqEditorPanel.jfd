@@ -9,37 +9,71 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
-				"$columnSpecs": "362:1.0, right:117:1.0, right:74"
-				"$rowSpecs": "0"
-				"$hGap": 5
-				"$vGap": 5
-				"$alignLeft": true
-				"$alignTop": true
-			} ) {
-				name: "panelControls"
-				"border": new javax.swing.border.SoftBevelBorder( 1, null, null, null, null )
+			add( new FormContainer( "javax.swing.JToolBar", new FormLayoutManager( class javax.swing.JToolBar ) ) {
+				name: "toolBarControls"
+				"rollover": true
 				auxiliary() {
 					"JavaCodeGenerator.variableGetter": true
 				}
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonNew"
+					"text": "Neu"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/add.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonEdit"
+					"text": "Ändern"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/gear_run.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "buttonDelete"
+					"text": "Löschen"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/cancel.png" )
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				} )
+				add( new FormComponent( "javax.swing.JToolBar$Separator" ) {
+					name: "separator3"
+				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "labelTitle"
-					"text": "Datei %s"
-					"font": new java.awt.Font( "Segoe UI", 0, 14 )
-					"enabled": false
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-					"insets": new java.awt.Insets( 2, 2, 2, 2 )
-					"gridwidth": 2
+					name: "labelFilter"
+					"text": "Filter:"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				} )
+				add( new FormComponent( "javax.swing.JToolBar$Separator" ) {
+					name: "separator1"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				} )
+				add( new FormComponent( "javax.swing.JComboBox" ) {
+					name: "comboBoxFilter"
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
+				} )
+				add( new FormComponent( "javax.swing.JToolBar$Separator" ) {
+					name: "separator2"
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "buttonSave"
-					"text": "Save"
+					"text": "Speichern"
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/icons/save.png" )
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-					"gridx": 2
+					auxiliary() {
+						"JavaCodeGenerator.variableGetter": true
+					}
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "First"
+				"value": "North"
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 				name: "panelEditor"
@@ -62,6 +96,29 @@ new FormModel {
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "Center"
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0, 0:1.0"
+				"$rowSpecs": "0"
+				"$hGap": 5
+				"$vGap": 5
+				"$alignLeft": true
+				"$alignTop": true
+			} ) {
+				name: "panelControls"
+				"border": new javax.swing.border.SoftBevelBorder( 1, null, null, null, null )
+				auxiliary() {
+					"JavaCodeGenerator.variableGetter": true
+				}
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "labelTitle"
+					"text": "Datei:"
+					"font": new java.awt.Font( "Segoe UI", 0, 14 )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridwidth": 2
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "South"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 5 )

@@ -11,47 +11,75 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * View for displaying and editing XML files with syntax highlighting.
- * Uses RSyntaxTextArea for:
- * - XML syntax highlighting
- * - Line numbers
- * - Code folding
- * - Find/Replace
- * - Copy/Paste (built-in)
+ * View for displaying and editing text files.
+ * Supports two modes:
+ * - XML mode: RSyntaxTextArea with syntax highlighting, line numbers, code folding
+ * - Properties mode: Table editor for .cfg and .properties files with Name/Value columns
  */
 public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectable {
     private static final Logger LOG = LoggerFactory.getLogger(ItsqEditorView.class);
 
+    private static final String CARD_XML = "xml";
+    private static final String CARD_PROPERTIES = "properties";
+
     private ItsqItem selectedItem;
+    private String currentMode = CARD_XML;
+
+    // XML Editor components
     private RSyntaxTextArea textArea;
     private RTextScrollPane rTextScrollPane;
-    private JToolBar toolbar;
-    private JButton buttonSave;
-    private JComboBox<String> searchComboBox;
-    private DefaultComboBoxModel<String> searchHistoryModel;
+    private DefaultComboBoxModel<String> filterHistoryModel;
     private JLabel statusLabel;
+
+    // Properties Table components
+    private JTable propertiesTable;
+    private PropertiesTableModel propertiesTableModel;
+
+    // CardLayout for switching between modes
+    private JPanel cardPanel;
+    private CardLayout cardLayout;
+
     private boolean modified = false;
-    private static final int MAX_SEARCH_HISTORY = 20;
+    private static final int MAX_FILTER_HISTORY = 20;
 
     public ItsqEditorView() {
         super();
+        initCardLayout();
         initSyntaxEditor();
+        initPropertiesEditor();
         setupToolbar();
         setupKeyboardShortcuts();
     }
 
     /**
-     * Initializes RSyntaxTextArea and replaces the default JEditorPane.
+     * Initializes the CardLayout for switching between XML and Properties mode.
+     */
+    private void initCardLayout() {
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+
+        // Replace the scrollPane with cardPanel in the parent container
+        Container parent = getScrollPaneEditor().getParent();
+        if (parent != null) {
+            parent.remove(getScrollPaneEditor());
+            parent.add(cardPanel, BorderLayout.CENTER);
+        }
+    }
+
+    /**
+     * Initializes RSyntaxTextArea for XML editing.
      */
     private void initSyntaxEditor() {
         // Create RSyntaxTextArea
@@ -70,24 +98,8 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         rTextScrollPane.setLineNumbersEnabled(true);
         rTextScrollPane.setFoldIndicatorEnabled(true);
 
-        // Get references before replacing scrollPane
-        Container parent = getScrollPaneEditor().getParent();
-        if (parent != null) {
-            // Find the toolbar (it's the first component at NORTH)
-            for (Component c : parent.getComponents()) {
-                if (c instanceof JToolBar) {
-                    toolbar = (JToolBar) c;
-                    // Save button is the first component
-                    if (toolbar.getComponentCount() > 0 && toolbar.getComponent(0) instanceof JButton) {
-                        buttonSave = (JButton) toolbar.getComponent(0);
-                    }
-                    break;
-                }
-            }
-            // Replace the scrollPane
-            parent.remove(getScrollPaneEditor());
-            parent.add(rTextScrollPane, BorderLayout.CENTER);
-        }
+        // Add to card panel
+        cardPanel.add(rTextScrollPane, CARD_XML);
 
         // Track modifications
         textArea.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -109,62 +121,121 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
     }
 
     /**
-     * Sets up the toolbar with additional buttons.
+     * Initializes the Properties table editor for .cfg and .properties files.
+     */
+    private void initPropertiesEditor() {
+        // Create table model and table
+        propertiesTableModel = new PropertiesTableModel();
+        propertiesTable = new JTable(propertiesTableModel);
+        propertiesTable.setFont(new Font("Consolas", Font.PLAIN, 13));
+        propertiesTable.setRowHeight(22);
+        propertiesTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+        propertiesTable.getColumnModel().getColumn(1).setPreferredWidth(400);
+        propertiesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Double-click to edit
+        propertiesTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    editSelectedProperty();
+                }
+            }
+        });
+
+        JScrollPane tableScrollPane = new JScrollPane(propertiesTable);
+
+        // Add to card panel
+        cardPanel.add(tableScrollPane, CARD_PROPERTIES);
+    }
+
+    /**
+     * Filters properties table by search text.
+     */
+    private void filterProperties(String filterText) {
+        propertiesTableModel.setFilter(filterText);
+    }
+
+    /**
+     * Sets up the toolbar buttons from JFormDesigner with their action listeners.
      */
     private void setupToolbar() {
-        if (toolbar == null) {
-            LOG.warn("Toolbar not found - cannot add search buttons");
-            return;
-        }
-
-        toolbar.addSeparator();
-
-        // Search combo box with history
-        searchHistoryModel = new DefaultComboBoxModel<>();
-        searchComboBox = new JComboBox<>(searchHistoryModel);
-        searchComboBox.setEditable(true);
-        searchComboBox.setMaximumSize(new Dimension(200, 25));
-        searchComboBox.setToolTipText("Suchbegriff eingeben, Enter zum Suchen (Strg+F)");
+        // Setup filter ComboBox with history model
+        filterHistoryModel = new DefaultComboBoxModel<>();
+        getComboBoxFilter().setModel(filterHistoryModel);
+        getComboBoxFilter().setEditable(true);
+        getComboBoxFilter().setToolTipText("Filter eingeben (XML: Strg+F zum Suchen, Properties: Filter nach Name/Wert)");
 
         // Get the editor component for key handling
-        JTextField editorField = (JTextField) searchComboBox.getEditor().getEditorComponent();
+        JTextField editorField = (JTextField) getComboBoxFilter().getEditor().getEditorComponent();
         editorField.addActionListener(e -> {
-            findNext();
-            addToSearchHistory(getSearchText());
+            if (CARD_XML.equals(currentMode)) {
+                findNext();
+                addToFilterHistory(getFilterText());
+            } else {
+                filterProperties(getFilterText());
+                addToFilterHistory(getFilterText());
+            }
         });
-        toolbar.add(searchComboBox);
 
-        // Find Next button
-        JButton findNextButton = new JButton("\u25BC"); // Down arrow
-        findNextButton.setToolTipText("Weitersuchen (F3)");
-        findNextButton.addActionListener(e -> findNext());
-        toolbar.add(findNextButton);
+        // Live filter for properties mode
+        editorField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                if (CARD_PROPERTIES.equals(currentMode)) {
+                    filterProperties(getFilterText());
+                }
+            }
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                if (CARD_PROPERTIES.equals(currentMode)) {
+                    filterProperties(getFilterText());
+                }
+            }
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                if (CARD_PROPERTIES.equals(currentMode)) {
+                    filterProperties(getFilterText());
+                }
+            }
+        });
 
-        // Find Previous button
-        JButton findPrevButton = new JButton("\u25B2"); // Up arrow
-        findPrevButton.setToolTipText("Rückwärts suchen (Shift+F3)");
-        findPrevButton.addActionListener(e -> findPrevious());
-        toolbar.add(findPrevButton);
+        // CRUD buttons - only enabled in Properties mode
+        getButtonNew().addActionListener(e -> addNewProperty());
+        getButtonEdit().addActionListener(e -> {
+            if (CARD_PROPERTIES.equals(currentMode)) {
+                editSelectedProperty();
+            }
+        });
+        getButtonDelete().addActionListener(e -> {
+            if (CARD_PROPERTIES.equals(currentMode)) {
+                deleteSelectedProperty();
+            }
+        });
 
-        toolbar.addSeparator();
+        // Save button
+        getButtonSave().addActionListener(e -> saveFile());
 
-        // Reload button
-        JButton reloadButton = new JButton();
-        reloadButton.setIcon(loadIcon("/icons/refresh.png"));
-        reloadButton.setToolTipText("Datei neu laden");
-        reloadButton.addActionListener(e -> reloadFile());
-        toolbar.add(reloadButton);
-
-        // Spacer
-        toolbar.add(Box.createHorizontalGlue());
-
-        // Status label
+        // Add status label to toolbar
+        getToolBarControls().add(Box.createHorizontalGlue());
         statusLabel = new JLabel("");
-        toolbar.add(statusLabel);
+        getToolBarControls().add(statusLabel);
+    }
 
-        // Configure Save button
-        if (buttonSave != null) {
-            buttonSave.addActionListener(e -> saveFile());
+    /**
+     * Updates the toolbar button states based on the current mode.
+     */
+    private void updateToolbarForMode() {
+        boolean isPropertiesMode = CARD_PROPERTIES.equals(currentMode);
+        getButtonNew().setEnabled(isPropertiesMode);
+        getButtonEdit().setEnabled(isPropertiesMode);
+        getButtonDelete().setEnabled(isPropertiesMode);
+
+        // Update filter label tooltip
+        if (isPropertiesMode) {
+            getLabelFilter().setToolTipText("Filter nach Name oder Wert");
+        } else {
+            getLabelFilter().setToolTipText("Suchbegriff (F3 = weiter, Shift+F3 = zurueck)");
         }
     }
 
@@ -172,18 +243,18 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
      * Sets up keyboard shortcuts.
      */
     private void setupKeyboardShortcuts() {
-        // Ctrl+F - Find
+        // Ctrl+F - Focus filter/search
         KeyStroke findKey = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
         textArea.getInputMap().put(findKey, "find");
         textArea.getActionMap().put("find", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                searchComboBox.requestFocusInWindow();
-                searchComboBox.getEditor().selectAll();
+                getComboBoxFilter().requestFocusInWindow();
+                getComboBoxFilter().getEditor().selectAll();
             }
         });
 
-        // F3 - Find Next
+        // F3 - Find Next (XML mode only)
         KeyStroke f3Key = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
         textArea.getInputMap().put(f3Key, "findNext");
         textArea.getActionMap().put("findNext", new AbstractAction() {
@@ -193,7 +264,7 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
             }
         });
 
-        // Shift+F3 - Find Previous
+        // Shift+F3 - Find Previous (XML mode only)
         KeyStroke shiftF3Key = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
         textArea.getInputMap().put(shiftF3Key, "findPrev");
         textArea.getActionMap().put("findPrev", new AbstractAction() {
@@ -252,11 +323,32 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
     // ===== File Operations =====
 
     /**
-     * Loads the selected XML file into the editor.
+     * Determines the editor mode based on file extension.
+     */
+    private String determineMode(File file) {
+        String name = file.getName().toLowerCase();
+        if (name.endsWith(".cfg") || name.endsWith(".properties")) {
+            return CARD_PROPERTIES;
+        }
+        return CARD_XML;
+    }
+
+    /**
+     * Switches to the specified editor mode.
+     */
+    private void switchMode(String mode) {
+        currentMode = mode;
+        cardLayout.show(cardPanel, mode);
+        updateToolbarForMode();
+    }
+
+    /**
+     * Loads the selected file into the appropriate editor.
      */
     private void loadFile() {
         if (selectedItem == null || selectedItem.getFile() == null) {
             textArea.setText("");
+            propertiesTableModel.clear();
             updateTitle(null);
             return;
         }
@@ -268,6 +360,20 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
             return;
         }
 
+        String mode = determineMode(file);
+        switchMode(mode);
+
+        if (CARD_PROPERTIES.equals(mode)) {
+            loadPropertiesFile(file);
+        } else {
+            loadXmlFile(file);
+        }
+    }
+
+    /**
+     * Loads an XML file into the syntax editor.
+     */
+    private void loadXmlFile(File file) {
         try {
             String content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
             textArea.setText(content);
@@ -279,6 +385,24 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         } catch (IOException e) {
             LOG.error("Failed to load file: {}", file.getAbsolutePath(), e);
             textArea.setText("Fehler beim Laden: " + e.getMessage());
+            updateTitle(file.getName() + " (Fehler)");
+        }
+    }
+
+    /**
+     * Loads a properties/cfg file into the table editor.
+     */
+    private void loadPropertiesFile(File file) {
+        try {
+            List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+            propertiesTableModel.loadFromLines(lines);
+            setModified(false);
+            updateTitle(file.getName());
+            updateStatus("Geladen: " + file.getName() + " (" + propertiesTableModel.getRowCount() + " Eintraege)");
+            LOG.info("Loaded properties file: {}", file.getAbsolutePath());
+        } catch (IOException e) {
+            LOG.error("Failed to load properties file: {}", file.getAbsolutePath(), e);
+            propertiesTableModel.clear();
             updateTitle(file.getName() + " (Fehler)");
         }
     }
@@ -304,16 +428,17 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
      */
     private void saveFile() {
         if (selectedItem == null || selectedItem.getFile() == null) {
-            JOptionPane.showMessageDialog(this, "Keine Datei ausgewählt");
+            JOptionPane.showMessageDialog(this, "Keine Datei ausgewaehlt");
             return;
         }
 
         File file = selectedItem.getFile();
         try {
-            Files.writeString(file.toPath(), textArea.getText(), StandardCharsets.UTF_8);
-            setModified(false);
-            updateStatus("Gespeichert: " + file.getName());
-            LOG.info("Saved XML file: {}", file.getAbsolutePath());
+            if (CARD_PROPERTIES.equals(currentMode)) {
+                savePropertiesFile(file);
+            } else {
+                saveXmlFile(file);
+            }
         } catch (IOException e) {
             LOG.error("Failed to save file: {}", file.getAbsolutePath(), e);
             JOptionPane.showMessageDialog(this,
@@ -322,52 +447,147 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         }
     }
 
-    // ===== Search Operations =====
-
     /**
-     * Focuses the search combo box.
+     * Saves XML content to file.
      */
-    private void showFindDialog() {
-        searchComboBox.requestFocusInWindow();
-        searchComboBox.getEditor().selectAll();
+    private void saveXmlFile(File file) throws IOException {
+        Files.writeString(file.toPath(), textArea.getText(), StandardCharsets.UTF_8);
+        setModified(false);
+        updateStatus("Gespeichert: " + file.getName());
+        LOG.info("Saved XML file: {}", file.getAbsolutePath());
     }
 
     /**
-     * Gets the current search text from the combo box.
+     * Saves properties content to file.
      */
-    private String getSearchText() {
-        Object item = searchComboBox.getEditor().getItem();
+    private void savePropertiesFile(File file) throws IOException {
+        List<String> lines = propertiesTableModel.toLines();
+        Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
+        setModified(false);
+        updateStatus("Gespeichert: " + file.getName());
+        LOG.info("Saved properties file: {}", file.getAbsolutePath());
+    }
+
+    // ===== Properties CRUD Operations =====
+
+    /**
+     * Adds a new property entry.
+     */
+    private void addNewProperty() {
+        JTextField nameField = new JTextField();
+        JTextField valueField = new JTextField();
+        Object[] message = {
+            "Name:", nameField,
+            "Wert:", valueField
+        };
+
+        int result = JOptionPane.showConfirmDialog(this, message, "Neuer Eintrag",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            String name = nameField.getText().trim();
+            String value = valueField.getText();
+            if (!name.isEmpty()) {
+                propertiesTableModel.addEntry(name, value);
+                setModified(true);
+                // Select the new row
+                int newRow = propertiesTableModel.getRowCount() - 1;
+                propertiesTable.setRowSelectionInterval(newRow, newRow);
+                propertiesTable.scrollRectToVisible(propertiesTable.getCellRect(newRow, 0, true));
+            }
+        }
+    }
+
+    /**
+     * Edits the selected property entry.
+     */
+    private void editSelectedProperty() {
+        int selectedRow = propertiesTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Bitte einen Eintrag auswaehlen");
+            return;
+        }
+
+        String currentName = (String) propertiesTableModel.getValueAt(selectedRow, 0);
+        String currentValue = (String) propertiesTableModel.getValueAt(selectedRow, 1);
+
+        JTextField nameField = new JTextField(currentName);
+        JTextField valueField = new JTextField(currentValue);
+        Object[] message = {
+            "Name:", nameField,
+            "Wert:", valueField
+        };
+
+        int result = JOptionPane.showConfirmDialog(this, message, "Eintrag bearbeiten",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            String newName = nameField.getText().trim();
+            String newValue = valueField.getText();
+            if (!newName.isEmpty()) {
+                propertiesTableModel.updateEntry(selectedRow, newName, newValue);
+                setModified(true);
+            }
+        }
+    }
+
+    /**
+     * Deletes the selected property entry.
+     */
+    private void deleteSelectedProperty() {
+        int selectedRow = propertiesTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Bitte einen Eintrag auswaehlen");
+            return;
+        }
+
+        String name = (String) propertiesTableModel.getValueAt(selectedRow, 0);
+        int result = JOptionPane.showConfirmDialog(this,
+                "Eintrag '" + name + "' wirklich loeschen?",
+                "Loeschen bestaetigen",
+                JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            propertiesTableModel.removeEntry(selectedRow);
+            setModified(true);
+        }
+    }
+
+    // ===== Search/Filter Operations =====
+
+    /**
+     * Gets the current filter/search text from the combo box.
+     */
+    private String getFilterText() {
+        Object item = getComboBoxFilter().getEditor().getItem();
         return item != null ? item.toString().trim() : "";
     }
 
     /**
-     * Adds a search term to the history (at the top, avoiding duplicates).
+     * Adds a filter term to the history (at the top, avoiding duplicates).
      */
-    private void addToSearchHistory(String searchText) {
-        if (searchText == null || searchText.isEmpty()) {
+    private void addToFilterHistory(String filterText) {
+        if (filterText == null || filterText.isEmpty()) {
             return;
         }
 
         // Remove if already exists (to move to top)
-        searchHistoryModel.removeElement(searchText);
+        filterHistoryModel.removeElement(filterText);
 
         // Add at the beginning
-        searchHistoryModel.insertElementAt(searchText, 0);
+        filterHistoryModel.insertElementAt(filterText, 0);
 
         // Limit history size
-        while (searchHistoryModel.getSize() > MAX_SEARCH_HISTORY) {
-            searchHistoryModel.removeElementAt(searchHistoryModel.getSize() - 1);
+        while (filterHistoryModel.getSize() > MAX_FILTER_HISTORY) {
+            filterHistoryModel.removeElementAt(filterHistoryModel.getSize() - 1);
         }
 
         // Keep the text in the editor
-        searchComboBox.getEditor().setItem(searchText);
+        getComboBoxFilter().getEditor().setItem(filterText);
     }
 
     /**
-     * Finds the next occurrence of the search text.
+     * Finds the next occurrence of the search text (XML mode).
      */
     private void findNext() {
-        String searchText = getSearchText();
+        String searchText = getFilterText();
         if (searchText.isEmpty()) {
             return;
         }
@@ -387,16 +607,16 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         if (!found) {
             updateStatus("Nicht gefunden: " + searchText);
         } else {
-            addToSearchHistory(searchText);
+            addToFilterHistory(searchText);
             updateStatus("");
         }
     }
 
     /**
-     * Finds the previous occurrence of the search text.
+     * Finds the previous occurrence of the search text (XML mode).
      */
     private void findPrevious() {
-        String searchText = getSearchText();
+        String searchText = getFilterText();
         if (searchText.isEmpty()) {
             return;
         }
@@ -416,7 +636,7 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         if (!found) {
             updateStatus("Nicht gefunden: " + searchText);
         } else {
-            addToSearchHistory(searchText);
+            addToFilterHistory(searchText);
             updateStatus("");
         }
     }
@@ -468,14 +688,6 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         }
     }
 
-    private Icon loadIcon(String path) {
-        java.net.URL url = getClass().getResource(path);
-        if (url != null) {
-            return new ImageIcon(url);
-        }
-        return null;
-    }
-
     // ===== Public Accessors =====
 
     public RSyntaxTextArea getTextArea() {
@@ -484,5 +696,183 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
 
     public boolean isModified() {
         return modified;
+    }
+
+    // ===== Inner Classes =====
+
+    /**
+     * Table model for properties/cfg files with Name/Value columns.
+     * Supports filtering, CRUD operations, and preserves comments/empty lines.
+     */
+    private static class PropertiesTableModel extends AbstractTableModel {
+        private static final String[] COLUMN_NAMES = {"Name", "Wert"};
+
+        // Original data (including comments and empty lines for preservation)
+        private final List<PropertyEntry> allEntries = new ArrayList<>();
+        // Filtered data for display
+        private final List<PropertyEntry> filteredEntries = new ArrayList<>();
+        private String filterText = "";
+
+        /**
+         * Represents a single line in the properties file.
+         */
+        private static class PropertyEntry {
+            String key;
+            String value;
+            boolean isComment;  // true for comments and empty lines
+            String originalLine; // preserved for comments
+
+            PropertyEntry(String key, String value) {
+                this.key = key;
+                this.value = value;
+                this.isComment = false;
+            }
+
+            PropertyEntry(String originalLine, boolean isComment) {
+                this.originalLine = originalLine;
+                this.isComment = isComment;
+                this.key = "";
+                this.value = "";
+            }
+        }
+
+        @Override
+        public int getRowCount() {
+            return filteredEntries.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return COLUMN_NAMES.length;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return COLUMN_NAMES[column];
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            if (rowIndex < 0 || rowIndex >= filteredEntries.size()) {
+                return null;
+            }
+            PropertyEntry entry = filteredEntries.get(rowIndex);
+            return columnIndex == 0 ? entry.key : entry.value;
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false; // Edit via dialog
+        }
+
+        /**
+         * Loads properties from file lines.
+         */
+        public void loadFromLines(List<String> lines) {
+            allEntries.clear();
+            for (String line : lines) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty() || trimmed.startsWith("#") || trimmed.startsWith("!")) {
+                    // Comment or empty line
+                    allEntries.add(new PropertyEntry(line, true));
+                } else {
+                    // Key=Value line
+                    int eqIndex = line.indexOf('=');
+                    if (eqIndex < 0) {
+                        eqIndex = line.indexOf(':');
+                    }
+                    if (eqIndex > 0) {
+                        String key = line.substring(0, eqIndex).trim();
+                        String value = line.substring(eqIndex + 1);
+                        allEntries.add(new PropertyEntry(key, value));
+                    } else {
+                        // Line without separator - treat as key with empty value
+                        allEntries.add(new PropertyEntry(trimmed, ""));
+                    }
+                }
+            }
+            applyFilter();
+        }
+
+        /**
+         * Converts the model back to lines for saving.
+         */
+        public List<String> toLines() {
+            List<String> lines = new ArrayList<>();
+            for (PropertyEntry entry : allEntries) {
+                if (entry.isComment) {
+                    lines.add(entry.originalLine);
+                } else {
+                    lines.add(entry.key + "=" + entry.value);
+                }
+            }
+            return lines;
+        }
+
+        /**
+         * Sets the filter text and updates the view.
+         */
+        public void setFilter(String text) {
+            this.filterText = text != null ? text.toLowerCase() : "";
+            applyFilter();
+        }
+
+        /**
+         * Applies the current filter to show only matching entries.
+         */
+        private void applyFilter() {
+            filteredEntries.clear();
+            for (PropertyEntry entry : allEntries) {
+                if (!entry.isComment) {
+                    if (filterText.isEmpty() ||
+                        entry.key.toLowerCase().contains(filterText) ||
+                        entry.value.toLowerCase().contains(filterText)) {
+                        filteredEntries.add(entry);
+                    }
+                }
+            }
+            fireTableDataChanged();
+        }
+
+        /**
+         * Adds a new property entry.
+         */
+        public void addEntry(String key, String value) {
+            PropertyEntry entry = new PropertyEntry(key, value);
+            allEntries.add(entry);
+            applyFilter();
+        }
+
+        /**
+         * Updates an entry at the given row index.
+         */
+        public void updateEntry(int filteredRowIndex, String newKey, String newValue) {
+            if (filteredRowIndex >= 0 && filteredRowIndex < filteredEntries.size()) {
+                PropertyEntry entry = filteredEntries.get(filteredRowIndex);
+                entry.key = newKey;
+                entry.value = newValue;
+                fireTableRowsUpdated(filteredRowIndex, filteredRowIndex);
+            }
+        }
+
+        /**
+         * Removes an entry at the given row index.
+         */
+        public void removeEntry(int filteredRowIndex) {
+            if (filteredRowIndex >= 0 && filteredRowIndex < filteredEntries.size()) {
+                PropertyEntry entry = filteredEntries.get(filteredRowIndex);
+                allEntries.remove(entry);
+                applyFilter();
+            }
+        }
+
+        /**
+         * Clears all entries.
+         */
+        public void clear() {
+            allEntries.clear();
+            filteredEntries.clear();
+            fireTableDataChanged();
+        }
     }
 }
