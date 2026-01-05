@@ -118,7 +118,7 @@ public class ItsqExplorerView extends BaseView {
         mainPanel.getCheckBoxActiveOnly().addActionListener(e -> applyFilter());
 
         // Source filter (Quelle) -> apply filter on tree
-        mainPanel.getComboBoxSource().addActionListener(e -> applyFilter());
+        mainPanel.getComboBoxTestSetSource().addActionListener(e -> applyFilter());
 
         // Phase filter -> apply filter on tree
         mainPanel.getComboBoxPhase().addActionListener(e -> applyFilter());
@@ -312,7 +312,7 @@ public class ItsqExplorerView extends BaseView {
         // Get filter settings
         String filterText = getFilterText();
         boolean activeOnly = mainPanel.getCheckBoxActiveOnly().isSelected();
-        String sourceFilter = (String) mainPanel.getComboBoxSource().getSelectedItem();
+        String sourceFilter = (String) mainPanel.getComboBoxTestSetSource().getSelectedItem();
         String phaseFilter = (String) mainPanel.getComboBoxPhase().getSelectedItem();
 
         // Reload tree model with all filters
