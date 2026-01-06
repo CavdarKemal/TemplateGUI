@@ -33,9 +33,9 @@
             </includes>
         </fileSet>
 
-        <!-- Entpackte Testfaelle einbinden -->
+        <!-- Entpackte Testfaelle aus Projektverzeichnis einbinden -->
         <fileSet>
-            <directory>${project.build.directory}/testfaelle</directory>
+            <directory>${project.basedir}/ITSQ</directory>
             <outputDirectory>/ITSQ</outputDirectory>
             <includes>
                 <include>**/*</include>

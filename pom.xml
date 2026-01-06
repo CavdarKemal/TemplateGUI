@@ -79,7 +79,7 @@
                             </artifactItems>
                         </configuration>
                     </execution>
-                    <!-- Option 2: Herunterladen und Entpacken -->
+                    <!-- Option 2: Herunterladen und Entpacken ins Projektverzeichnis -->
                     <execution>
                         <id>unpack-testfaelle</id>
                         <phase>generate-resources</phase>
@@ -94,7 +94,7 @@
                                     <version>${testfaelle.version}</version>
                                     <classifier>${testfaelle.classifier}</classifier>
                                     <type>${testfaelle.type}</type>
-                                    <outputDirectory>${project.build.directory}/testfaelle</outputDirectory>
+                                    <outputDirectory>${project.basedir}/ITSQ</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
