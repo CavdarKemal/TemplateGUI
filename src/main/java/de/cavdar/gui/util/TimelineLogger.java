@@ -15,6 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * Central logging utility that manages both standard logging and timeline/performance tracking.
  * All classes should use this instead of declaring their own loggers.
  *
+ * <h3>Configuration:</h3>
+ * <pre>
+ *     // Configure logging with custom directory and filenames
+ *     File logsDir = new File("path/to/logs");
+ *     TimelineLogger.configure(logsDir, "myapp.log", "myapp-actions.log");
+ *
+ *     // Close when done
+ *     TimelineLogger.close();
+ * </pre>
+ *
  * <h3>Standard Logging:</h3>
  * <pre>
  *     // Instead of: private static final Logger LOG = LoggerFactory.getLogger(MyClass.class);
@@ -43,15 +53,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  *
  * @author TemplateGUI
- * @version 2.0
+ * @version 2.1
  */
 public class TimelineLogger {
 
-    // ===== Timeline Logger Configuration =====
+    // ===== Logger Configuration =====
     private static final String TIMELINE_LOGGER_NAME = "TIMELINE";
     private static final String TIMELINE_APPENDER_NAME = "TimelineAppender";
-    private static final String TIMELINE_LOG_FILE_NAME = "timeline.log";
+    private static final String APP_APPENDER_NAME = "AppFileAppender";
     private static final String TIMELINE_PATTERN = "%d{dd.MM.yyyy HH:mm:ss.SSS} | %m%n";
+    private static final String APP_PATTERN = "%d{dd.MM.yyyy HH:mm:ss.SSS} [%-5p] %c - %m%n";
 
     // SLF4J Logger for timeline logging calls
     private static final Logger TIMELINE = LoggerFactory.getLogger(TIMELINE_LOGGER_NAME);
@@ -64,6 +75,7 @@ public class TimelineLogger {
     // ===== Timeline Action Tracking =====
     private static final Map<String, ActionInfo> activeActions = new ConcurrentHashMap<>();
     private static RollingFileAppender timelineAppender;
+    private static RollingFileAppender appAppender;
     private static long actionCounter = 0;
 
     static {
@@ -154,25 +166,83 @@ public class TimelineLogger {
     }
 
     // ==========================================================================
-    // TIMELINE LOGGER CONFIGURATION
+    // LOGGER CONFIGURATION
     // ==========================================================================
 
     /**
-     * Configures the timeline logger to write to the specified directory.
-     * Called by TestEnvironmentManager when switching environments.
+     * Configures both the application logger and the timeline/action logger.
+     * This is the central configuration point for all file-based logging.
      *
-     * @param logsDir the directory for log files
+     * @param logOutputDir    the directory for log files
+     * @param appLogFileName  the filename for application logs (e.g., "app.log")
+     * @param actionLogFileName the filename for timeline/action logs (e.g., "actions.log")
      * @return true if configuration was successful
      */
-    public static boolean configure(File logsDir) {
+    public static boolean configure(File logOutputDir, String appLogFileName, String actionLogFileName) {
         try {
-            File logFile = new File(logsDir, TIMELINE_LOG_FILE_NAME);
+            // Ensure directory exists
+            if (!logOutputDir.exists() && !logOutputDir.mkdirs()) {
+                System.err.println("[TimelineLogger] Could not create log directory: " + logOutputDir.getAbsolutePath());
+                return false;
+            }
 
+            // Configure application logger
+            boolean appConfigured = configureAppLogger(new File(logOutputDir, appLogFileName));
+
+            // Configure timeline logger
+            boolean timelineConfigured = configureTimelineLogger(new File(logOutputDir, actionLogFileName));
+
+            return appConfigured && timelineConfigured;
+        } catch (Exception e) {
+            System.err.println("[TimelineLogger] Error configuring: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Configures the application file appender.
+     */
+    private static boolean configureAppLogger(File logFile) {
+        try {
+            org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
+
+            if (appAppender != null) {
+                // Update existing appender
+                appAppender.setFile(logFile.getAbsolutePath());
+                appAppender.activateOptions();
+                System.out.println("[TimelineLogger] App logger reconfigured: " + logFile.getAbsolutePath());
+                return true;
+            }
+
+            // Create new appender
+            appAppender = new RollingFileAppender();
+            appAppender.setName(APP_APPENDER_NAME);
+            appAppender.setFile(logFile.getAbsolutePath());
+            appAppender.setMaxFileSize("10MB");
+            appAppender.setMaxBackupIndex(10);
+            appAppender.setLayout(new PatternLayout(APP_PATTERN));
+            appAppender.setAppend(true);
+            appAppender.activateOptions();
+
+            rootLogger.addAppender(appAppender);
+            System.out.println("[TimelineLogger] App logger initialized: " + logFile.getAbsolutePath());
+            return true;
+        } catch (Exception e) {
+            System.err.println("[TimelineLogger] Error configuring app logger: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Configures the timeline file appender.
+     */
+    private static boolean configureTimelineLogger(File logFile) {
+        try {
             if (timelineAppender != null) {
                 // Update existing appender
                 timelineAppender.setFile(logFile.getAbsolutePath());
                 timelineAppender.activateOptions();
-                TIMELINE.info("Timeline logger reconfigured: {}", logFile.getAbsolutePath());
+                System.out.println("[TimelineLogger] Timeline logger reconfigured: " + logFile.getAbsolutePath());
                 return true;
             }
 
@@ -187,22 +257,29 @@ public class TimelineLogger {
             timelineAppender.activateOptions();
 
             LOG4J_TIMELINE.addAppender(timelineAppender);
-            TIMELINE.info("Timeline logger initialized: {}", logFile.getAbsolutePath());
+            System.out.println("[TimelineLogger] Timeline logger initialized: " + logFile.getAbsolutePath());
             return true;
         } catch (Exception e) {
-            System.err.println("[TimelineLogger] Error configuring: " + e.getMessage());
+            System.err.println("[TimelineLogger] Error configuring timeline logger: " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Closes the timeline logger and releases file handles.
+     * Closes all loggers and releases file handles.
      */
     public static void close() {
+        // Close timeline appender
         if (timelineAppender != null) {
             timelineAppender.close();
             LOG4J_TIMELINE.removeAppender(timelineAppender);
             timelineAppender = null;
+        }
+        // Close app appender
+        if (appAppender != null) {
+            appAppender.close();
+            org.apache.log4j.Logger.getRootLogger().removeAppender(appAppender);
+            appAppender = null;
         }
         activeActions.clear();
     }

@@ -1,15 +1,6 @@
 package de.cavdar.gui.util;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
-
-
 import java.io.File;
-import java.io.IOException;
-import java.util.Enumeration;
 
 /**
  * Manages test environment directories and logging configuration.
@@ -73,29 +64,11 @@ public class TestEnvironmentManager {
     }
 
     /**
-     * Closes the FileAppender to release file handles.
+     * Closes all loggers to release file handles.
      * Useful for testing to allow temp directory cleanup.
      */
     public static void closeLogging() {
-        try {
-            // Close timeline logger
-            TimelineLogger.close();
-
-            // Close main file appender
-            Logger rootLogger = Logger.getRootLogger();
-            Enumeration<?> appenders = rootLogger.getAllAppenders();
-
-            while (appenders.hasMoreElements()) {
-                Object appender = appenders.nextElement();
-                if (appender instanceof FileAppender) {
-                    FileAppender fileAppender = (FileAppender) appender;
-                    fileAppender.close();
-                    rootLogger.removeAppender(fileAppender);
-                }
-            }
-        } catch (Exception e) {
-            // Ignore errors during cleanup
-        }
+        TimelineLogger.close();
     }
 
     /**
@@ -141,15 +114,11 @@ public class TestEnvironmentManager {
             return false;
         }
 
-        // Configure logging
-        File logFile = new File(logsDir, envName + ".log");
-        if (!configureLogging(logFile)) {
+        // Configure logging (both app and timeline logs)
+        String appLogFileName = envName + ".log";
+        String actionLogFileName = envName + "-actions.log";
+        if (!TimelineLogger.configure(logsDir, appLogFileName, actionLogFileName)) {
             TimelineLogger.warn(TestEnvironmentManager.class, "Could not configure logging for environment: {}", envName);
-        }
-
-        // Configure timeline logger
-        if (!TimelineLogger.configure(logsDir)) {
-            TimelineLogger.warn(TestEnvironmentManager.class, "Could not configure timeline logging for environment: {}", envName);
         }
 
         // Update state
@@ -179,54 +148,6 @@ public class TestEnvironmentManager {
             return true;
         } catch (SecurityException e) {
             TimelineLogger.error(TestEnvironmentManager.class, "Security exception creating directories", e);
-            return false;
-        }
-    }
-
-    /**
-     * Configures log4j FileAppender to use the specified log file.
-     * If no FileAppender exists, creates a new RollingFileAppender.
-     */
-    private static boolean configureLogging(File logFile) {
-        try {
-            Logger rootLogger = Logger.getRootLogger();
-            Enumeration<?> appenders = rootLogger.getAllAppenders();
-            FileAppender existingFileAppender = null;
-
-            // Find existing FileAppender
-            while (appenders.hasMoreElements()) {
-                Object appender = appenders.nextElement();
-                if (appender instanceof FileAppender) {
-                    existingFileAppender = (FileAppender) appender;
-                    break;
-                }
-            }
-
-            if (existingFileAppender != null) {
-                // Update existing FileAppender
-                existingFileAppender.setFile(logFile.getAbsolutePath());
-                existingFileAppender.activateOptions();
-                System.out.println("[TestEnvironmentManager] Log file set to: " + logFile.getAbsolutePath());
-                return true;
-            }
-
-            // No FileAppender found, create a new RollingFileAppender
-            System.out.println("[TestEnvironmentManager] Creating new FileAppender for: " + logFile.getAbsolutePath());
-            RollingFileAppender newAppender = new RollingFileAppender();
-            newAppender.setName("FileAppender");
-            newAppender.setFile(logFile.getAbsolutePath());
-            newAppender.setMaxFileSize("10MB");
-            newAppender.setMaxBackupIndex(10);
-            newAppender.setLayout(new PatternLayout("%d{dd.MM.yyyy HH:mm:ss.SSS} [%-5p] %c - %m%n"));
-            newAppender.setAppend(true);
-            newAppender.activateOptions();
-
-            rootLogger.addAppender(newAppender);
-            System.out.println("[TestEnvironmentManager] FileAppender created and added to root logger");
-            return true;
-        } catch (Exception e) {
-            System.err.println("[TestEnvironmentManager] Error configuring logging: " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
