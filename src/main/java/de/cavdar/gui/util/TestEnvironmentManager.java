@@ -78,6 +78,10 @@ public class TestEnvironmentManager {
      */
     public static void closeLogging() {
         try {
+            // Close timeline logger
+            TimelineLogger.close();
+
+            // Close main file appender
             Logger rootLogger = Logger.getRootLogger();
             Enumeration<?> appenders = rootLogger.getAllAppenders();
 
@@ -141,6 +145,11 @@ public class TestEnvironmentManager {
         File logFile = new File(logsDir, envName + ".log");
         if (!configureLogging(logFile)) {
             LOG.warn("Could not configure logging for environment: {}", envName);
+        }
+
+        // Configure timeline logger
+        if (!TimelineLogger.configure(logsDir)) {
+            LOG.warn("Could not configure timeline logging for environment: {}", envName);
         }
 
         // Update state
