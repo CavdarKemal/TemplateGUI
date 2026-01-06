@@ -12,50 +12,150 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Specialized logger for timeline/performance tracking.
- * Logs actions with start time, end time, and duration to a separate file.
- * Integrates with TestEnvironmentManager for environment-specific log files.
+ * Central logging utility that manages both standard logging and timeline/performance tracking.
+ * All classes should use this instead of declaring their own loggers.
  *
- * Usage:
+ * <h3>Standard Logging:</h3>
  * <pre>
+ *     // Instead of: private static final Logger LOG = LoggerFactory.getLogger(MyClass.class);
+ *     // Use:
+ *     TimelineLogger.info(MyClass.class, "Processing {} items", count);
+ *     TimelineLogger.debug(MyClass.class, "Details: {}", details);
+ *     TimelineLogger.warn(MyClass.class, "Warning message");
+ *     TimelineLogger.error(MyClass.class, "Error occurred", exception);
+ * </pre>
+ *
+ * <h3>Timeline/Performance Tracking:</h3>
+ * <pre>
+ *     // Variante 1: Start/End mit ID
  *     String actionId = TimelineLogger.start("loadData", "Loading customer data");
  *     // ... do work ...
- *     TimelineLogger.end(actionId);
+ *     TimelineLogger.end(actionId);  // oder: TimelineLogger.end(actionId, "OK");
  *
- *     // Or with try-with-resources:
+ *     // Variante 2: Try-with-resources (empfohlen)
  *     try (TimelineLogger.Action action = TimelineLogger.action("processFile")) {
  *         // ... do work ...
+ *         action.result("5 records");  // optional
  *     }
+ *
+ *     // Variante 3: Einzelnes Event
+ *     TimelineLogger.event("userLogin", "user=admin");
  * </pre>
  *
  * @author TemplateGUI
- * @version 1.0
+ * @version 2.0
  */
 public class TimelineLogger {
 
-    private static final String LOGGER_NAME = "TIMELINE";
-    private static final String APPENDER_NAME = "TimelineAppender";
-    private static final String LOG_FILE_NAME = "timeline.log";
-    private static final String PATTERN = "%d{dd.MM.yyyy HH:mm:ss.SSS} | %m%n";
+    // ===== Timeline Logger Configuration =====
+    private static final String TIMELINE_LOGGER_NAME = "TIMELINE";
+    private static final String TIMELINE_APPENDER_NAME = "TimelineAppender";
+    private static final String TIMELINE_LOG_FILE_NAME = "timeline.log";
+    private static final String TIMELINE_PATTERN = "%d{dd.MM.yyyy HH:mm:ss.SSS} | %m%n";
 
-    // SLF4J Logger for logging calls
-    private static final Logger TIMELINE = LoggerFactory.getLogger(LOGGER_NAME);
-    // Log4j Logger for appender configuration
-    private static final org.apache.log4j.Logger LOG4J_TIMELINE = org.apache.log4j.Logger.getLogger(LOGGER_NAME);
+    // SLF4J Logger for timeline logging calls
+    private static final Logger TIMELINE = LoggerFactory.getLogger(TIMELINE_LOGGER_NAME);
+    // Log4j Logger for timeline appender configuration
+    private static final org.apache.log4j.Logger LOG4J_TIMELINE = org.apache.log4j.Logger.getLogger(TIMELINE_LOGGER_NAME);
 
+    // ===== Standard Logger Cache =====
+    private static final Map<Class<?>, Logger> loggerCache = new ConcurrentHashMap<>();
+
+    // ===== Timeline Action Tracking =====
     private static final Map<String, ActionInfo> activeActions = new ConcurrentHashMap<>();
-
-    private static RollingFileAppender fileAppender;
+    private static RollingFileAppender timelineAppender;
     private static long actionCounter = 0;
 
     static {
-        // Prevent log propagation to root logger
+        // Prevent timeline log propagation to root logger
         LOG4J_TIMELINE.setAdditivity(false);
     }
 
     private TimelineLogger() {
         // Utility class
     }
+
+    // ==========================================================================
+    // STANDARD LOGGING METHODS
+    // ==========================================================================
+
+    /**
+     * Gets or creates a logger for the specified class.
+     * Use this if you need the Logger instance directly.
+     *
+     * @param clazz the class to get logger for
+     * @return the SLF4J logger
+     */
+    public static Logger getLogger(Class<?> clazz) {
+        return loggerCache.computeIfAbsent(clazz, LoggerFactory::getLogger);
+    }
+
+    /**
+     * Logs a TRACE message.
+     */
+    public static void trace(Class<?> clazz, String message, Object... args) {
+        getLogger(clazz).trace(message, args);
+    }
+
+    /**
+     * Logs a DEBUG message.
+     */
+    public static void debug(Class<?> clazz, String message, Object... args) {
+        getLogger(clazz).debug(message, args);
+    }
+
+    /**
+     * Logs an INFO message.
+     */
+    public static void info(Class<?> clazz, String message, Object... args) {
+        getLogger(clazz).info(message, args);
+    }
+
+    /**
+     * Logs a WARN message.
+     */
+    public static void warn(Class<?> clazz, String message, Object... args) {
+        getLogger(clazz).warn(message, args);
+    }
+
+    /**
+     * Logs a WARN message with exception.
+     */
+    public static void warn(Class<?> clazz, String message, Throwable t) {
+        getLogger(clazz).warn(message, t);
+    }
+
+    /**
+     * Logs an ERROR message.
+     */
+    public static void error(Class<?> clazz, String message, Object... args) {
+        getLogger(clazz).error(message, args);
+    }
+
+    /**
+     * Logs an ERROR message with exception.
+     */
+    public static void error(Class<?> clazz, String message, Throwable t) {
+        getLogger(clazz).error(message, t);
+    }
+
+    /**
+     * Checks if DEBUG level is enabled for the class.
+     */
+    public static boolean isDebugEnabled(Class<?> clazz) {
+        return getLogger(clazz).isDebugEnabled();
+    }
+
+    /**
+     * Checks if TRACE level is enabled for the class.
+     */
+    public static boolean isTraceEnabled(Class<?> clazz) {
+        return getLogger(clazz).isTraceEnabled();
+    }
+
+    // ==========================================================================
+    // TIMELINE LOGGER CONFIGURATION
+    // ==========================================================================
 
     /**
      * Configures the timeline logger to write to the specified directory.
@@ -66,27 +166,27 @@ public class TimelineLogger {
      */
     public static boolean configure(File logsDir) {
         try {
-            File logFile = new File(logsDir, LOG_FILE_NAME);
+            File logFile = new File(logsDir, TIMELINE_LOG_FILE_NAME);
 
-            if (fileAppender != null) {
+            if (timelineAppender != null) {
                 // Update existing appender
-                fileAppender.setFile(logFile.getAbsolutePath());
-                fileAppender.activateOptions();
-                TIMELINE.info("Timeline logger reconfigured: " + logFile.getAbsolutePath());
+                timelineAppender.setFile(logFile.getAbsolutePath());
+                timelineAppender.activateOptions();
+                TIMELINE.info("Timeline logger reconfigured: {}", logFile.getAbsolutePath());
                 return true;
             }
 
             // Create new appender
-            fileAppender = new RollingFileAppender();
-            fileAppender.setName(APPENDER_NAME);
-            fileAppender.setFile(logFile.getAbsolutePath());
-            fileAppender.setMaxFileSize("10MB");
-            fileAppender.setMaxBackupIndex(5);
-            fileAppender.setLayout(new PatternLayout(PATTERN));
-            fileAppender.setAppend(true);
-            fileAppender.activateOptions();
+            timelineAppender = new RollingFileAppender();
+            timelineAppender.setName(TIMELINE_APPENDER_NAME);
+            timelineAppender.setFile(logFile.getAbsolutePath());
+            timelineAppender.setMaxFileSize("10MB");
+            timelineAppender.setMaxBackupIndex(5);
+            timelineAppender.setLayout(new PatternLayout(TIMELINE_PATTERN));
+            timelineAppender.setAppend(true);
+            timelineAppender.activateOptions();
 
-            LOG4J_TIMELINE.addAppender(fileAppender);
+            LOG4J_TIMELINE.addAppender(timelineAppender);
             TIMELINE.info("Timeline logger initialized: {}", logFile.getAbsolutePath());
             return true;
         } catch (Exception e) {
@@ -99,13 +199,17 @@ public class TimelineLogger {
      * Closes the timeline logger and releases file handles.
      */
     public static void close() {
-        if (fileAppender != null) {
-            fileAppender.close();
-            LOG4J_TIMELINE.removeAppender(fileAppender);
-            fileAppender = null;
+        if (timelineAppender != null) {
+            timelineAppender.close();
+            LOG4J_TIMELINE.removeAppender(timelineAppender);
+            timelineAppender = null;
         }
         activeActions.clear();
     }
+
+    // ==========================================================================
+    // TIMELINE ACTION TRACKING
+    // ==========================================================================
 
     /**
      * Starts tracking an action.
@@ -222,6 +326,10 @@ public class TimelineLogger {
     public static Action action(String actionName, String description) {
         return new Action(actionName, description);
     }
+
+    // ==========================================================================
+    // HELPER METHODS AND INNER CLASSES
+    // ==========================================================================
 
     private static synchronized String generateActionId(String actionName) {
         return actionName + "-" + (++actionCounter);
