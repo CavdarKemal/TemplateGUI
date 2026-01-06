@@ -2,6 +2,7 @@ package de.cavdar.gui.util;
 
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.spi.LoggingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,7 @@ public class TimelineLogger {
     private static final String TIMELINE_LOGGER_NAME = "TIMELINE";
     private static final String TIMELINE_APPENDER_NAME = "TimelineAppender";
     private static final String APP_APPENDER_NAME = "AppFileAppender";
+    private static final String APP_PACKAGE = "de.cavdar";
     private static final String TIMELINE_PATTERN = "%d{dd.MM.yyyy HH:mm:ss.SSS} | %m%n";
     private static final String APP_PATTERN = "%d{dd.MM.yyyy HH:mm:ss.SSS} [%-5p] %c - %m%n";
 
@@ -186,15 +188,24 @@ public class TimelineLogger {
                 return false;
             }
 
-            // Configure application logger
-            appAppender = configureAppender(appAppender, APP_APPENDER_NAME, APP_PATTERN,
-                    new File(logOutputDir, appLogFileName));
+            File appLogFile = new File(logOutputDir, appLogFileName);
+            File actionLogFile = new File(logOutputDir, actionLogFileName);
+
+            // Rotate existing log files
+            rotateExistingLogFile(appLogFile);
+            rotateExistingLogFile(actionLogFile);
+
+            // Configure application logger (only for de.cavdar.* packages)
+            appAppender = configureAppender(appAppender, APP_APPENDER_NAME, APP_PATTERN, appLogFile, true);
             if (appAppender == null) return false;
-            org.apache.log4j.Logger.getRootLogger().addAppender(appAppender);
+            org.apache.log4j.Logger appPackageLogger = org.apache.log4j.Logger.getLogger(APP_PACKAGE);
+            appPackageLogger.setAdditivity(false);  // Don't propagate to root logger
+            if (!appPackageLogger.isAttached(appAppender)) {
+                appPackageLogger.addAppender(appAppender);
+            }
 
             // Configure timeline logger
-            timelineAppender = configureAppender(timelineAppender, TIMELINE_APPENDER_NAME, TIMELINE_PATTERN,
-                    new File(logOutputDir, actionLogFileName));
+            timelineAppender = configureAppender(timelineAppender, TIMELINE_APPENDER_NAME, TIMELINE_PATTERN, actionLogFile, false);
             if (timelineAppender == null) return false;
             if (!LOG4J_TIMELINE.isAttached(timelineAppender)) {
                 LOG4J_TIMELINE.addAppender(timelineAppender);
@@ -207,11 +218,41 @@ public class TimelineLogger {
         }
     }
 
+    /**
+     * Rotates an existing log file by renaming it to .001, .002, etc.
+     */
+    private static void rotateExistingLogFile(File logFile) {
+        if (!logFile.exists()) {
+            return;
+        }
+
+        // Find next available number
+        int number = 1;
+        File rotatedFile;
+        do {
+            rotatedFile = new File(logFile.getAbsolutePath() + String.format(".%03d", number));
+            number++;
+        } while (rotatedFile.exists() && number < 1000);
+
+        if (number >= 1000) {
+            System.err.println("[TimelineLogger] Too many rotated log files for: " + logFile.getName());
+            return;
+        }
+
+        if (logFile.renameTo(rotatedFile)) {
+            System.out.println("[TimelineLogger] Rotated " + logFile.getName() + " -> " + rotatedFile.getName());
+        } else {
+            System.err.println("[TimelineLogger] Could not rotate: " + logFile.getName());
+        }
+    }
+
     private static RollingFileAppender configureAppender(RollingFileAppender existingAppender,
-                                                         String appenderName, String pattern, File logFile) {
+                                                         String appenderName, String pattern, File logFile,
+                                                         boolean shortenPackageNames) {
         try {
             if (existingAppender != null) {
                 // Update existing appender
+                rotateExistingLogFile(logFile);
                 existingAppender.setFile(logFile.getAbsolutePath());
                 existingAppender.activateOptions();
                 System.out.println("[TimelineLogger] " + appenderName + " reconfigured: " + logFile.getAbsolutePath());
@@ -224,7 +265,7 @@ public class TimelineLogger {
             appender.setFile(logFile.getAbsolutePath());
             appender.setMaxFileSize("10MB");
             appender.setMaxBackupIndex(5);
-            appender.setLayout(new PatternLayout(pattern));
+            appender.setLayout(shortenPackageNames ? new ShortenedPackageLayout(pattern) : new PatternLayout(pattern));
             appender.setAppend(true);
             appender.activateOptions();
             System.out.println("[TimelineLogger] " + appenderName + " initialized: " + logFile.getAbsolutePath());
@@ -232,6 +273,22 @@ public class TimelineLogger {
         } catch (Exception e) {
             System.err.println("[TimelineLogger] Error configuring " + appenderName + ": " + e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Custom PatternLayout that shortens package names.
+     * de.cavdar.gui -> de.c.g
+     */
+    private static class ShortenedPackageLayout extends PatternLayout {
+        ShortenedPackageLayout(String pattern) {
+            super(pattern);
+        }
+
+        @Override
+        public String format(LoggingEvent event) {
+            String original = super.format(event);
+            return original.replace("de.cavdar.gui", "de.c.g");
         }
     }
 
@@ -248,7 +305,7 @@ public class TimelineLogger {
         // Close app appender
         if (appAppender != null) {
             appAppender.close();
-            org.apache.log4j.Logger.getRootLogger().removeAppender(appAppender);
+            org.apache.log4j.Logger.getLogger(APP_PACKAGE).removeAppender(appAppender);
             appAppender = null;
         }
         activeActions.clear();
