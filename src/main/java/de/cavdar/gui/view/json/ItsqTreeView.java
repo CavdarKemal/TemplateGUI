@@ -1,13 +1,12 @@
 package de.cavdar.gui.view.json;
-import de.cavdar.gui.view.base.BaseView;
 
 import de.cavdar.gui.design.base.BaseViewPanel;
 import de.cavdar.gui.design.json.ItsqTreeViewPanel;
 import de.cavdar.gui.model.base.AppConfig;
+import de.cavdar.gui.util.TimelineLogger;
+import de.cavdar.gui.view.base.BaseView;
 
 import static de.cavdar.gui.util.AppConstants.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -47,7 +46,6 @@ import java.util.Comparator;
  * @version 1.0
  */
 public class ItsqTreeView extends BaseView {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqTreeView.class);
 
     private ItsqTreeViewPanel itsqPanel;
     private final AppConfig cfg = AppConfig.getInstance();
@@ -67,7 +65,7 @@ public class ItsqTreeView extends BaseView {
         // Load initial data
         SwingUtilities.invokeLater(this::loadItsqDirectory);
 
-        LOG.debug("ItsqTreeView created");
+        TimelineLogger.debug(ItsqTreeView.class, "ItsqTreeView created");
     }
 
     @Override
@@ -140,7 +138,7 @@ public class ItsqTreeView extends BaseView {
         File itsqDir = resolveItsqPath(itsqPath);
 
         if (!itsqDir.exists() || !itsqDir.isDirectory()) {
-            LOG.warn("ITSQ directory not found: {}", itsqDir.getAbsolutePath());
+            TimelineLogger.warn(ItsqTreeView.class, "ITSQ directory not found: {}", itsqDir.getAbsolutePath());
             showError("ITSQ-Verzeichnis nicht gefunden: " + itsqDir.getAbsolutePath());
             return;
         }
@@ -169,7 +167,7 @@ public class ItsqTreeView extends BaseView {
         // Update statistics
         updateStatistics();
 
-        LOG.info("Loaded ITSQ directory: {} ({} files, {} dirs)",
+        TimelineLogger.info(ItsqTreeView.class, "Loaded ITSQ directory: {} ({} files, {} dirs)",
                 itsqDir.getAbsolutePath(), totalFiles, totalDirs);
     }
 
@@ -184,7 +182,7 @@ public class ItsqTreeView extends BaseView {
     private File resolveItsqPath(String path) {
         File file = new File(path);
         if (file.isAbsolute() && file.exists()) {
-            LOG.debug("ITSQ path is absolute: {}", file);
+            TimelineLogger.debug(ItsqTreeView.class, "ITSQ path is absolute: {}", file);
             return file;
         }
 
@@ -196,7 +194,7 @@ public class ItsqTreeView extends BaseView {
             if (configDir != null) {
                 File itsqDir = new File(configDir, path);
                 if (itsqDir.exists()) {
-                    LOG.debug("ITSQ found relative to config: {}", itsqDir);
+                    TimelineLogger.debug(ItsqTreeView.class, "ITSQ found relative to config: {}", itsqDir);
                     return itsqDir;
                 }
             }
@@ -225,14 +223,14 @@ public class ItsqTreeView extends BaseView {
                     if (distDir.exists()) {
                         File itsqDir = new File(distDir, path);
                         if (itsqDir.exists()) {
-                            LOG.debug("ITSQ found in distribution: {}", itsqDir);
+                            TimelineLogger.debug(ItsqTreeView.class, "ITSQ found in distribution: {}", itsqDir);
                             return itsqDir;
                         }
                     }
                     // Check in testfaelle (unpacked artifact)
                     File testfaelleDir = new File(targetDir, "testfaelle");
                     if (testfaelleDir.exists()) {
-                        LOG.debug("ITSQ found in testfaelle: {}", testfaelleDir);
+                        TimelineLogger.debug(ItsqTreeView.class, "ITSQ found in testfaelle: {}", testfaelleDir);
                         // Update the path field to show actual location
                         itsqPanel.getItsqPathField().setText(testfaelleDir.getAbsolutePath());
                         return testfaelleDir;
@@ -241,30 +239,30 @@ public class ItsqTreeView extends BaseView {
 
                 File itsqDir = new File(jarDir, path);
                 if (itsqDir.exists()) {
-                    LOG.debug("ITSQ found relative to JAR: {}", itsqDir);
+                    TimelineLogger.debug(ItsqTreeView.class, "ITSQ found relative to JAR: {}", itsqDir);
                     return itsqDir;
                 }
             }
         } catch (Exception e) {
-            LOG.debug("Could not resolve JAR path: {}", e.getMessage());
+            TimelineLogger.debug(ItsqTreeView.class, "Could not resolve JAR path: {}", e.getMessage());
         }
 
         // Try relative to current working directory
         File relative = new File(System.getProperty("user.dir"), path);
         if (relative.exists()) {
-            LOG.debug("ITSQ found in working directory: {}", relative);
+            TimelineLogger.debug(ItsqTreeView.class, "ITSQ found in working directory: {}", relative);
             return relative;
         }
 
         // Try target/testfaelle directly (for IDE runs)
         File targetTestfaelle = new File("target/testfaelle");
         if (targetTestfaelle.exists()) {
-            LOG.debug("ITSQ found in target/testfaelle: {}", targetTestfaelle);
+            TimelineLogger.debug(ItsqTreeView.class, "ITSQ found in target/testfaelle: {}", targetTestfaelle);
             itsqPanel.getItsqPathField().setText(targetTestfaelle.getAbsolutePath());
             return targetTestfaelle;
         }
 
-        LOG.warn("ITSQ directory not found for path: {}", path);
+        TimelineLogger.warn(ItsqTreeView.class, "ITSQ directory not found for path: {}", path);
         return relative;
     }
 
@@ -407,7 +405,7 @@ public class ItsqTreeView extends BaseView {
             itsqPanel.getFileContentArea().setText(content);
             itsqPanel.getFileContentArea().setCaretPosition(0);
         } catch (IOException e) {
-            LOG.error("Failed to read file: {}", file, e);
+            TimelineLogger.error(ItsqTreeView.class, "Failed to read file: {}", file, e);
             itsqPanel.getFileContentArea().setText("Fehler beim Lesen: " + e.getMessage());
         }
     }

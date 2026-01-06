@@ -2,8 +2,7 @@ package de.cavdar.gui.itsq.view;
 
 import de.cavdar.gui.itsq.design.ItsqMainPanel;
 import de.cavdar.gui.model.base.AppConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
 
 import javax.swing.*;
 import java.io.File;
@@ -17,7 +16,6 @@ import static de.cavdar.gui.util.AppConstants.*;
  * @author TemplateGUI
  */
 public class ItsqMainView extends ItsqMainPanel {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqMainView.class);
 
     private static final String TESTSET_HISTORY_KEY = "itsq.testset.history";
     private static final int MAX_HISTORY = 20;
@@ -35,7 +33,7 @@ public class ItsqMainView extends ItsqMainPanel {
         initTestSetComboBox();
         setupListeners();
 
-        LOG.debug("ItsqMainView created");
+        TimelineLogger.debug(ItsqMainView.class, "ItsqMainView created");
     }
 
     /**
@@ -213,7 +211,7 @@ public class ItsqMainView extends ItsqMainPanel {
         File itsqDir = resolveItsqPath();
 
         if (!itsqDir.exists() || !itsqDir.isDirectory()) {
-            LOG.warn("ITSQ directory not found: {}", itsqDir.getAbsolutePath());
+            TimelineLogger.warn(ItsqMainView.class, "ITSQ directory not found: {}", itsqDir.getAbsolutePath());
             JOptionPane.showMessageDialog(this,
                     "ITSQ-Verzeichnis nicht gefunden: " + itsqDir.getAbsolutePath(),
                     "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -238,7 +236,7 @@ public class ItsqMainView extends ItsqMainPanel {
         lastValidSelection = path;
         addToFilterHistory(filterText);
 
-        LOG.info("Loaded ITSQ: {} ({} files, {} dirs, filter: '{}', source: '{}', phase: '{}')",
+        TimelineLogger.info(ItsqMainView.class, "Loaded ITSQ: {} ({} files, {} dirs, filter: '{}', source: '{}', phase: '{}')",
                 path, getPanelItsqTree().getTotalFiles(), getPanelItsqTree().getTotalDirs(),
                 filterText, sourceFilter, phaseFilter);
     }

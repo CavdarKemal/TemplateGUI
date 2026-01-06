@@ -3,8 +3,7 @@ package de.cavdar.gui.itsq.view;
 import de.cavdar.gui.itsq.design.ItsqViewTabPanel;
 import de.cavdar.gui.itsq.model.ItsqItem;
 import de.cavdar.gui.itsq.tree.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +15,6 @@ import java.awt.*;
  * @author TemplateGUI
  */
 public class ItsqViewTabView extends ItsqViewTabPanel {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqViewTabView.class);
 
     // Card names (must match ItsqViewTabPanel)
     private static final String CARD_ROOT = "cardItsqRoot";
@@ -47,7 +45,7 @@ public class ItsqViewTabView extends ItsqViewTabPanel {
 
         showCard(cardName, item);
 
-        LOG.debug("Showing card: {} for item: {}", cardName, item != null ? item.getName() : "null");
+        TimelineLogger.debug(ItsqViewTabView.class, "Showing card: {} for item: {}", cardName, item != null ? item.getName() : "null");
     }
 
     /**

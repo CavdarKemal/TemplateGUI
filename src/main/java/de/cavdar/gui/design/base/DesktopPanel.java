@@ -2,8 +2,8 @@ package de.cavdar.gui.design.base;
 
 import de.cavdar.gui.view.base.BaseView;
 import de.cavdar.gui.view.db.DatabaseView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,7 @@ import java.util.Arrays;
  * @since 2024-12-25
  */
 public class DesktopPanel extends EmbeddablePanel {
-    private static final Logger LOG = LoggerFactory.getLogger(DesktopPanel.class);
+
 
     private JDesktopPane desktopPane;
     private DatabaseView databaseView;
@@ -35,7 +35,7 @@ public class DesktopPanel extends EmbeddablePanel {
     protected void initializePanel() {
         desktopPane = new JDesktopPane();
         add(desktopPane, BorderLayout.CENTER);
-        LOG.debug("DesktopPanel initialized");
+        TimelineLogger.debug(DesktopPanel.class, "DesktopPanel initialized");
     }
 
     /**
@@ -53,7 +53,7 @@ public class DesktopPanel extends EmbeddablePanel {
      * @param view the view to open
      */
     public void openView(BaseView view) {
-        LOG.info("Opening view: {}", view.getTitle());
+        TimelineLogger.info(DesktopPanel.class, "Opening view: {}", view.getTitle());
         desktopPane.add(view);
         view.setVisible(true);
     }
@@ -72,7 +72,7 @@ public class DesktopPanel extends EmbeddablePanel {
                 databaseView.setSelected(true);
                 databaseView.toFront();
             } catch (PropertyVetoException e) {
-                LOG.warn("Could not bring DatabaseView to front", e);
+                TimelineLogger.warn(DesktopPanel.class, "Could not bring DatabaseView to front", e);
             }
         } else {
             databaseView = new DatabaseView(connectionName);
@@ -97,7 +97,7 @@ public class DesktopPanel extends EmbeddablePanel {
      */
     public void layoutCascaded() {
         JInternalFrame[] frames = getOpenFrames();
-        LOG.debug("Arranging {} frames in cascade layout", frames.length);
+        TimelineLogger.debug(DesktopPanel.class, "Arranging {} frames in cascade layout", frames.length);
 
         int x = 0, y = 0;
         int offset = 30;
@@ -106,7 +106,7 @@ public class DesktopPanel extends EmbeddablePanel {
             try {
                 f.setMaximum(false);
             } catch (PropertyVetoException e) {
-                LOG.warn("Could not restore frame from maximized state", e);
+                TimelineLogger.warn(DesktopPanel.class, "Could not restore frame from maximized state", e);
             }
 
             f.setBounds(x, y, 600, 400);
@@ -126,7 +126,7 @@ public class DesktopPanel extends EmbeddablePanel {
         JInternalFrame[] frames = getOpenFrames();
         if (frames.length == 0) return;
 
-        LOG.debug("Arranging {} frames in vertical tile layout", frames.length);
+        TimelineLogger.debug(DesktopPanel.class, "Arranging {} frames in vertical tile layout", frames.length);
 
         int width = desktopPane.getWidth() / frames.length;
         int height = desktopPane.getHeight();
@@ -135,7 +135,7 @@ public class DesktopPanel extends EmbeddablePanel {
             try {
                 frames[i].setMaximum(false);
             } catch (PropertyVetoException e) {
-                LOG.warn("Could not restore frame at position {}", i, e);
+                TimelineLogger.warn(DesktopPanel.class, "Could not restore frame at position {}", i, e);
             }
             frames[i].setBounds(i * width, 0, width, height);
         }
@@ -148,7 +148,7 @@ public class DesktopPanel extends EmbeddablePanel {
         JInternalFrame[] frames = getOpenFrames();
         if (frames.length == 0) return;
 
-        LOG.debug("Arranging {} frames in horizontal tile layout", frames.length);
+        TimelineLogger.debug(DesktopPanel.class, "Arranging {} frames in horizontal tile layout", frames.length);
 
         int width = desktopPane.getWidth();
         int height = desktopPane.getHeight() / frames.length;
@@ -157,7 +157,7 @@ public class DesktopPanel extends EmbeddablePanel {
             try {
                 frames[i].setMaximum(false);
             } catch (PropertyVetoException e) {
-                LOG.warn("Could not restore frame at position {}", i, e);
+                TimelineLogger.warn(DesktopPanel.class, "Could not restore frame at position {}", i, e);
             }
             frames[i].setBounds(0, i * height, width, height);
         }

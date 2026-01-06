@@ -1,11 +1,10 @@
 package de.cavdar.gui;
 
 import de.cavdar.gui.design.base.MainFrame;
+import de.cavdar.gui.util.TimelineLogger;
 import de.cavdar.gui.view.itsq.ItsqExplorerView;
 import de.cavdar.gui.view.json.ItsqTreeView;
 import de.cavdar.gui.view.prozess.ProzessView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
@@ -17,7 +16,6 @@ import javax.swing.*;
  * @version 1.0
  */
 public class Main {
-    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     /**
      * Application entry point.
@@ -28,10 +26,10 @@ public class Main {
         // Set config file path from command line argument (must be before AppConfig is loaded)
         if (args.length > 0 && args[0] != null && !args[0].isEmpty()) {
             System.setProperty("config.file", args[0]);
-            LOG.info("Config file set from argument: {}", args[0]);
+            TimelineLogger.info(Main.class, "Config file set from argument: {}", args[0]);
         }
 
-        LOG.info("Starting MDI Application");
+        TimelineLogger.info(Main.class, "Starting MDI Application");
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame();
 

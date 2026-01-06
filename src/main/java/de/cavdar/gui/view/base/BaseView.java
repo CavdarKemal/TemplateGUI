@@ -2,8 +2,7 @@ package de.cavdar.gui.view.base;
 
 import de.cavdar.gui.design.base.BaseViewPanel;
 import de.cavdar.gui.model.base.AppConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +26,6 @@ import java.awt.*;
  * @since 2024-12-25
  */
 public abstract class BaseView extends JInternalFrame implements ViewInfo {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseView.class);
 
     /**
      * Application configuration - available to all subclasses
@@ -56,7 +54,7 @@ public abstract class BaseView extends JInternalFrame implements ViewInfo {
         setupToolbarActions();
         setupListeners();
 
-        LOG.debug("BaseView created: {}", title);
+        TimelineLogger.debug(BaseView.class, "BaseView created: {}", title);
     }
 
     /**
@@ -75,7 +73,7 @@ public abstract class BaseView extends JInternalFrame implements ViewInfo {
     private void setupCancelAction() {
         panel.getCancelButton().addActionListener(e -> {
             if (currentWorker != null) {
-                LOG.info("Cancelling background task in view: {}", getTitle());
+                TimelineLogger.info(BaseView.class, "Cancelling background task in view: {}", getTitle());
                 currentWorker.cancel(true);
             }
         });
@@ -102,7 +100,7 @@ public abstract class BaseView extends JInternalFrame implements ViewInfo {
      * @param taskLogic the task logic to execute in background
      */
     protected void executeTask(Runnable taskLogic) {
-        LOG.info("Starting background task in view: {}", getTitle());
+        TimelineLogger.info(BaseView.class, "Starting background task in view: {}", getTitle());
 
         panel.setProgressVisible(true, true);
 
@@ -117,10 +115,10 @@ public abstract class BaseView extends JInternalFrame implements ViewInfo {
             protected void done() {
                 panel.setProgressVisible(false, false);
                 if (isCancelled()) {
-                    LOG.info("Background task cancelled in view: {}", getTitle());
+                    TimelineLogger.info(BaseView.class, "Background task cancelled in view: {}", getTitle());
                     JOptionPane.showMessageDialog(BaseView.this, "Aktion abgebrochen.");
                 } else {
-                    LOG.info("Background task completed in view: {}", getTitle());
+                    TimelineLogger.info(BaseView.class, "Background task completed in view: {}", getTitle());
                 }
             }
         };

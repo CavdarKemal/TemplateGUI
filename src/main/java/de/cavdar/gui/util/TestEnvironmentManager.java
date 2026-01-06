@@ -5,7 +5,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
-import org.slf4j.LoggerFactory;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.Enumeration;
  * @version 1.0
  */
 public class TestEnvironmentManager {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TestEnvironmentManager.class);
+
 
     private static final String TEST_ENVS_DIR = "TEST-ENVS";
     private static final String LOGS_DIR = "logs";
@@ -44,7 +44,7 @@ public class TestEnvironmentManager {
      */
     public static void setBaseDirectory(File baseDir) {
         baseDirectory = baseDir;
-        LOG.debug("Base directory set to: {}", baseDir);
+        TimelineLogger.debug(TestEnvironmentManager.class, "Base directory set to: {}", baseDir);
     }
 
     /**
@@ -123,11 +123,11 @@ public class TestEnvironmentManager {
         String envName = extractEnvironmentName(configFileName);
 
         if (envName.equals(currentEnvironment)) {
-            LOG.debug("Already in environment: {}", envName);
+            TimelineLogger.debug(TestEnvironmentManager.class, "Already in environment: {}", envName);
             return true;
         }
 
-        LOG.info("Switching to environment: {}", envName);
+        TimelineLogger.info(TestEnvironmentManager.class, "Switching to environment: {}", envName);
 
         // Create directory structure
         File baseDir = getBaseDirectory();
@@ -144,12 +144,12 @@ public class TestEnvironmentManager {
         // Configure logging
         File logFile = new File(logsDir, envName + ".log");
         if (!configureLogging(logFile)) {
-            LOG.warn("Could not configure logging for environment: {}", envName);
+            TimelineLogger.warn(TestEnvironmentManager.class, "Could not configure logging for environment: {}", envName);
         }
 
         // Configure timeline logger
         if (!TimelineLogger.configure(logsDir)) {
-            LOG.warn("Could not configure timeline logging for environment: {}", envName);
+            TimelineLogger.warn(TestEnvironmentManager.class, "Could not configure timeline logging for environment: {}", envName);
         }
 
         // Update state
@@ -158,7 +158,7 @@ public class TestEnvironmentManager {
         currentLogsDir = logsDir;
         currentTestOutputsDir = testOutputsDir;
 
-        LOG.info("Environment switched to: {} ({})", envName, envDir.getAbsolutePath());
+        TimelineLogger.info(TestEnvironmentManager.class, "Environment switched to: {} ({})", envName, envDir.getAbsolutePath());
         return true;
     }
 
@@ -168,17 +168,17 @@ public class TestEnvironmentManager {
     private static boolean createDirectories(File logsDir, File testOutputsDir) {
         try {
             if (!logsDir.exists() && !logsDir.mkdirs()) {
-                LOG.error("Could not create logs directory: {}", logsDir.getAbsolutePath());
+                TimelineLogger.error(TestEnvironmentManager.class, "Could not create logs directory: {}", logsDir.getAbsolutePath());
                 return false;
             }
             if (!testOutputsDir.exists() && !testOutputsDir.mkdirs()) {
-                LOG.error("Could not create test outputs directory: {}", testOutputsDir.getAbsolutePath());
+                TimelineLogger.error(TestEnvironmentManager.class, "Could not create test outputs directory: {}", testOutputsDir.getAbsolutePath());
                 return false;
             }
-            LOG.debug("Directories created/verified: {}, {}", logsDir.getAbsolutePath(), testOutputsDir.getAbsolutePath());
+            TimelineLogger.debug(TestEnvironmentManager.class, "Directories created/verified: {}, {}", logsDir.getAbsolutePath(), testOutputsDir.getAbsolutePath());
             return true;
         } catch (SecurityException e) {
-            LOG.error("Security exception creating directories", e);
+            TimelineLogger.error(TestEnvironmentManager.class, "Security exception creating directories", e);
             return false;
         }
     }

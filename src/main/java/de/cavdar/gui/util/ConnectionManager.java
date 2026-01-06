@@ -2,8 +2,6 @@ package de.cavdar.gui.util;
 
 import de.cavdar.gui.model.base.AppConfig;
 import de.cavdar.gui.model.base.ConnectionInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +15,6 @@ import java.util.List;
  * @since 2024-12-24
  */
 public final class ConnectionManager {
-    private static final Logger LOG = LoggerFactory.getLogger(ConnectionManager.class);
     private static final String CONNECTIONS_KEY = "DB_CONNECTIONS";
     private static final String LAST_CONNECTION_KEY = "LAST_DB_CONNECTION";
     private static final String CONNECTION_SEPARATOR = ";;";
@@ -84,7 +81,7 @@ public final class ConnectionManager {
         }
 
         loaded = true;
-        LOG.debug("Loaded {} database connections", connections.size());
+        TimelineLogger.debug(ConnectionManager.class, "Loaded {} database connections", connections.size());
     }
 
     /**
@@ -95,7 +92,7 @@ public final class ConnectionManager {
         loaded = false;
         loadConnections();
         notifyListeners();
-        LOG.info("Connections reloaded from configuration");
+        TimelineLogger.info(ConnectionManager.class, "Connections reloaded from configuration");
     }
 
     /**
@@ -111,7 +108,7 @@ public final class ConnectionManager {
         AppConfig cfg = AppConfig.getInstance();
         cfg.setProperty(CONNECTIONS_KEY, sb.toString());
         cfg.save();
-        LOG.debug("Saved {} database connections", connections.size());
+        TimelineLogger.debug(ConnectionManager.class, "Saved {} database connections", connections.size());
         notifyListeners();
     }
 
@@ -171,7 +168,7 @@ public final class ConnectionManager {
         connections.removeIf(c -> c.getName().equals(conn.getName()));
         connections.add(conn);
         saveConnections();
-        LOG.info("Saved connection: {}", conn.getName());
+        TimelineLogger.info(ConnectionManager.class, "Saved connection: {}", conn.getName());
     }
 
     /**
@@ -188,7 +185,7 @@ public final class ConnectionManager {
         boolean removed = connections.removeIf(c -> c.getName().equals(name));
         if (removed) {
             saveConnections();
-            LOG.info("Deleted connection: {}", name);
+            TimelineLogger.info(ConnectionManager.class, "Deleted connection: {}", name);
         }
         return removed;
     }

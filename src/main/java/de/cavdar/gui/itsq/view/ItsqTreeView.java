@@ -3,8 +3,7 @@ package de.cavdar.gui.itsq.view;
 import de.cavdar.gui.itsq.design.ItsqTreePanel;
 import de.cavdar.gui.itsq.model.ItsqItem;
 import de.cavdar.gui.itsq.tree.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -18,7 +17,6 @@ import java.util.function.Consumer;
  * @author TemplateGUI
  */
 public class ItsqTreeView extends ItsqTreePanel {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqTreeView.class);
 
     private ItsqTreeModel treeModel;
     private Consumer<ItsqTreeNode> selectionCallback;
@@ -60,7 +58,7 @@ public class ItsqTreeView extends ItsqTreePanel {
                        String sourceFilter, String phaseFilter) {
         treeModel.reload(itsqDir, filterText, activeOnly, sourceFilter, phaseFilter);
         expandToLevel(2);
-        LOG.debug("Tree reloaded: {} files, {} dirs", treeModel.getTotalFiles(), treeModel.getTotalDirs());
+        TimelineLogger.debug(ItsqTreeView.class, "Tree reloaded: {} files, {} dirs", treeModel.getTotalFiles(), treeModel.getTotalDirs());
     }
 
     /**

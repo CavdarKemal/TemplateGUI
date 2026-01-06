@@ -3,9 +3,8 @@ package de.cavdar.gui.design.base;
 import de.cavdar.gui.model.base.AppConfig;
 import de.cavdar.gui.util.ConnectionManager;
 import de.cavdar.gui.util.TestEnvironmentManager;
+import de.cavdar.gui.util.TimelineLogger;
 import de.cavdar.gui.view.base.BaseView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +26,6 @@ import java.util.function.Supplier;
  * @version 3.0
  */
 public class MainFrame extends JFrame implements ConnectionManager.ConnectionListener {
-    private static final Logger LOG = LoggerFactory.getLogger(MainFrame.class);
 
     private final AppConfig cfg = AppConfig.getInstance();
     private DesktopPanel desktopPanel;
@@ -102,7 +100,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         this.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
-                LOG.info("Application closing, saving window state");
+                TimelineLogger.info(MainFrame.class, "Application closing, saving window state");
                 ConnectionManager.removeListener(MainFrame.this);
                 cfg.setProperty("LAST_WINDOW_WIDTH", String.valueOf(getWidth()));
                 cfg.setProperty("LAST_WINDOW_HEIGHT", String.valueOf(getHeight()));
@@ -113,7 +111,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
             }
         });
 
-        LOG.info("MainFrame initialized with dual-toolbar layout");
+        TimelineLogger.info(MainFrame.class, "MainFrame initialized with dual-toolbar layout");
     }
 
     /**
@@ -296,7 +294,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
             addViewToToolbar(reg);
         }
 
-        LOG.info("Registered view: {}", reg.menuLabel());
+        TimelineLogger.info(MainFrame.class, "Registered view: {}", reg.menuLabel());
     }
 
     private void addViewToMenu(ViewRegistration reg) {
@@ -345,10 +343,10 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
             String lafClass = cfg.getProperty("LAST_LOOK_AND_FEEL_CLASS");
             if (!lafClass.isEmpty()) {
                 UIManager.setLookAndFeel(lafClass);
-                LOG.debug("Look and Feel set to: {}", lafClass);
+                TimelineLogger.debug(MainFrame.class, "Look and Feel set to: {}", lafClass);
             }
         } catch (Exception e) {
-            LOG.warn("Could not set Look and Feel, using default", e);
+            TimelineLogger.warn(MainFrame.class, "Could not set Look and Feel, using default", e);
         }
 
         int w = cfg.getInt("LAST_WINDOW_WIDTH", 1200);
@@ -465,7 +463,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
      * Called before switching to a different config file.
      */
     private void saveCurrentSettings() {
-        LOG.info("Saving current settings before config switch");
+        TimelineLogger.info(MainFrame.class, "Saving current settings before config switch");
 
         // Save DB connection selection
         String dbConnection = (String) cbDbConnections.getSelectedItem();
@@ -499,7 +497,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         saveCurrentSettings();
 
         File configFile = new File(configDirectory, configName);
-        LOG.info("Loading configuration: {}", configFile.getAbsolutePath());
+        TimelineLogger.info(MainFrame.class, "Loading configuration: {}", configFile.getAbsolutePath());
 
         if (cfg.loadFrom(configFile.getAbsolutePath())) {
             currentConfigName = configName;
@@ -509,7 +507,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
             TestEnvironmentManager.switchEnvironment(configName);
 
             reloadAllSettings();
-            LOG.info("Configuration loaded: {}", configName);
+            TimelineLogger.info(MainFrame.class, "Configuration loaded: {}", configName);
         } else {
             JOptionPane.showMessageDialog(this,
                     "Fehler beim Laden der Konfiguration:\n" + configFile.getAbsolutePath(),
@@ -522,7 +520,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
      * Reloads all settings when config changes.
      */
     private void reloadAllSettings() {
-        LOG.info("Reloading all settings");
+        TimelineLogger.info(MainFrame.class, "Reloading all settings");
         isReloading = true;
         try {
             // Reload DB connections from new config
@@ -538,7 +536,7 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
                 if (!lastConn.isEmpty()) {
                     cbDbConnections.setSelectedItem(lastConn);
                 }
-                LOG.info("DB connection set to: {}", lastConn);
+                TimelineLogger.info(MainFrame.class, "DB connection set to: {}", lastConn);
             }
 
             // Reload comboboxes

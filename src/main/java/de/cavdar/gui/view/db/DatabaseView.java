@@ -9,8 +9,8 @@ import de.cavdar.gui.util.AppConstants;
 import de.cavdar.gui.util.ConnectionManager;
 
 import static de.cavdar.gui.util.AppConstants.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
+
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -42,7 +42,7 @@ import java.util.Vector;
  * @since 2024-12-25
  */
 public class DatabaseView extends BaseView implements ConnectionManager.ConnectionListener {
-    private static final Logger LOG = LoggerFactory.getLogger(DatabaseView.class);
+
     private static final int MAX_HISTORY_SIZE = 20;
 
     private DatabaseViewPanel dbPanel;
@@ -81,7 +81,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
         // Register for connection changes
         ConnectionManager.addListener(this);
 
-        LOG.debug("DatabaseView created");
+        TimelineLogger.debug(DatabaseView.class, "DatabaseView created");
     }
 
     @Override
@@ -149,7 +149,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
             // Close existing connection when selecting "Neue Verbindung"
             if (connection != null) {
                 disconnect();
-                LOG.info("Closed existing connection for new connection setup");
+                TimelineLogger.info(DatabaseView.class, "Closed existing connection for new connection setup");
             }
             // Clear fields for new connection
             dbPanel.getConnectionNameField().setText("");
@@ -193,7 +193,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
             cb.setSelectedIndex(1);
         }
 
-        LOG.debug("Loaded {} saved connections", connections.size());
+        TimelineLogger.debug(DatabaseView.class, "Loaded {} saved connections", connections.size());
     }
 
     private void saveCurrentConnection() {
@@ -255,7 +255,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
 
         executeTask(() -> {
             try {
-                LOG.info("Connecting to database: {}", url);
+                TimelineLogger.info(DatabaseView.class, "Connecting to database: {}", url);
                 Class.forName(driver);
                 connection = DriverManager.getConnection(url, username, password);
 
@@ -265,10 +265,10 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
                     dbPanel.getConnectButton().setText("Trennen");
                     dbPanel.getExecuteButton().setEnabled(true);
                     loadTables();
-                    LOG.info("Database connection established");
+                    TimelineLogger.info(DatabaseView.class, "Database connection established");
                 });
             } catch (ClassNotFoundException e) {
-                LOG.error("JDBC driver not found: {}", driver, e);
+                TimelineLogger.error(DatabaseView.class, "JDBC driver not found: {}", driver, e);
                 SwingUtilities.invokeLater(() -> {
                     JOptionPane.showMessageDialog(DatabaseView.this,
                             "JDBC-Treiber nicht gefunden: " + driver + "\n\n" +
@@ -277,7 +277,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
                             JOptionPane.ERROR_MESSAGE);
                 });
             } catch (SQLException e) {
-                LOG.error("Database connection failed", e);
+                TimelineLogger.error(DatabaseView.class, "Database connection failed", e);
                 SwingUtilities.invokeLater(() -> {
                     JOptionPane.showMessageDialog(DatabaseView.this,
                             "Verbindungsfehler: " + e.getMessage(),
@@ -292,10 +292,10 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                LOG.info("Database connection closed");
+                TimelineLogger.info(DatabaseView.class, "Database connection closed");
             }
         } catch (SQLException e) {
-            LOG.error("Error closing database connection", e);
+            TimelineLogger.error(DatabaseView.class, "Error closing database connection", e);
         } finally {
             connection = null;
             dbPanel.getStatusLabel().setText("Nicht verbunden");
@@ -355,11 +355,11 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
             dbPanel.getTableTreeModel().reload();
             expandTableTree();
 
-            LOG.info("Loaded {} tables and {} views",
+            TimelineLogger.info(DatabaseView.class, "Loaded {} tables and {} views",
                     tablesNode.getChildCount(), viewsNode.getChildCount());
 
         } catch (SQLException e) {
-            LOG.error("Failed to load tables", e);
+            TimelineLogger.error(DatabaseView.class, "Failed to load tables", e);
             root.add(new DefaultMutableTreeNode("Fehler: " + e.getMessage()));
             dbPanel.getTableTreeModel().reload();
         }
@@ -464,10 +464,10 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
             }
 
             dbPanel.getTableTreeModel().nodeStructureChanged(tableNode);
-            LOG.debug("Loaded {} columns for table {}", tableNode.getChildCount(), tableName);
+            TimelineLogger.debug(DatabaseView.class, "Loaded {} columns for table {}", tableNode.getChildCount(), tableName);
 
         } catch (SQLException e) {
-            LOG.error("Failed to load columns for table: {}", tableName, e);
+            TimelineLogger.error(DatabaseView.class, "Failed to load columns for table: {}", tableName, e);
             tableNode.removeAllChildren();
             tableNode.add(new DefaultMutableTreeNode("Fehler: " + e.getMessage()));
             dbPanel.getTableTreeModel().nodeStructureChanged(tableNode);
@@ -489,7 +489,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
         if ("Tabellen".equals(parentName) || "Views".equals(parentName)) {
             String tableName = node.toString();
             dbPanel.getQueryArea().setText("SELECT * FROM " + tableName);
-            LOG.debug("Selected table/view: {}", tableName);
+            TimelineLogger.debug(DatabaseView.class, "Selected table/view: {}", tableName);
         }
     }
 
@@ -504,7 +504,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
 
         executeTask(() -> {
             long startTime = System.currentTimeMillis();
-            LOG.info("Executing SQL: {}", sql);
+            TimelineLogger.info(DatabaseView.class, "Executing SQL: {}", sql);
 
             try (Statement stmt = connection.createStatement()) {
                 boolean isResultSet = stmt.execute(sql);
@@ -539,7 +539,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
                             dbPanel.getExportExcelButton().setEnabled(rowCount > 0);
                             // Add to history on successful execution
                             addToHistory(sql);
-                            LOG.info("Query returned {} rows in {} ms", rowCount, duration);
+                            TimelineLogger.info(DatabaseView.class, "Query returned {} rows in {} ms", rowCount, duration);
                         });
                     }
                 } else {
@@ -558,11 +558,11 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
                                 updateCount + " Zeilen wurden aktualisiert.",
                                 "Ausführung erfolgreich",
                                 JOptionPane.INFORMATION_MESSAGE);
-                        LOG.info("Update affected {} rows in {} ms", updateCount, duration);
+                        TimelineLogger.info(DatabaseView.class, "Update affected {} rows in {} ms", updateCount, duration);
                     });
                 }
             } catch (SQLException e) {
-                LOG.error("SQL execution failed", e);
+                TimelineLogger.error(DatabaseView.class, "SQL execution failed", e);
                 SwingUtilities.invokeLater(() -> {
                     JOptionPane.showMessageDialog(DatabaseView.this,
                             "SQL-Fehler: " + e.getMessage(),
@@ -614,7 +614,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
             }
         }
 
-        LOG.debug("Loaded SQL history/favorites");
+        TimelineLogger.debug(DatabaseView.class, "Loaded SQL history/favorites");
     }
 
     private void onHistorySelected() {
@@ -662,7 +662,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
         JOptionPane.showMessageDialog(this,
                 "Abfrage wurde zu Favoriten hinzugefügt.",
                 "Favorit gespeichert", JOptionPane.INFORMATION_MESSAGE);
-        LOG.info("Added SQL to favorites: {}", sql.substring(0, Math.min(50, sql.length())));
+        TimelineLogger.info(DatabaseView.class, "Added SQL to favorites: {}", sql.substring(0, Math.min(50, sql.length())));
     }
 
     private void removeFromHistory() {
@@ -706,7 +706,7 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
 
         cfg.save();
         loadSqlHistory();
-        LOG.info("Removed SQL from {}: {}", isFavorite ? "favorites" : "history",
+        TimelineLogger.info(DatabaseView.class, "Removed SQL from {}: {}", isFavorite ? "favorites" : "history",
                 sql.substring(0, Math.min(50, sql.length())));
     }
 
@@ -796,10 +796,10 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
             JOptionPane.showMessageDialog(this,
                     "Export erfolgreich: " + file.getAbsolutePath() + "\n" + rowCount + " Zeilen exportiert.",
                     "Export abgeschlossen", JOptionPane.INFORMATION_MESSAGE);
-            LOG.info("Exported {} rows to CSV: {}", rowCount, file.getAbsolutePath());
+            TimelineLogger.info(DatabaseView.class, "Exported {} rows to CSV: {}", rowCount, file.getAbsolutePath());
 
         } catch (IOException e) {
-            LOG.error("CSV export failed", e);
+            TimelineLogger.error(DatabaseView.class, "CSV export failed", e);
             JOptionPane.showMessageDialog(this,
                     "Fehler beim Export: " + e.getMessage(),
                     "Export-Fehler", JOptionPane.ERROR_MESSAGE);
@@ -868,10 +868,10 @@ public class DatabaseView extends BaseView implements ConnectionManager.Connecti
             JOptionPane.showMessageDialog(this,
                     "Export erfolgreich: " + file.getAbsolutePath() + "\n" + rowCount + " Zeilen exportiert.",
                     "Export abgeschlossen", JOptionPane.INFORMATION_MESSAGE);
-            LOG.info("Exported {} rows to Excel (HTML): {}", rowCount, file.getAbsolutePath());
+            TimelineLogger.info(DatabaseView.class, "Exported {} rows to Excel (HTML): {}", rowCount, file.getAbsolutePath());
 
         } catch (IOException e) {
-            LOG.error("Excel export failed", e);
+            TimelineLogger.error(DatabaseView.class, "Excel export failed", e);
             JOptionPane.showMessageDialog(this,
                     "Fehler beim Export: " + e.getMessage(),
                     "Export-Fehler", JOptionPane.ERROR_MESSAGE);

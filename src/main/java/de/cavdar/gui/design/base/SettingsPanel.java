@@ -2,8 +2,8 @@ package de.cavdar.gui.design.base;
 
 import de.cavdar.gui.model.base.AppConfig;
 import de.cavdar.gui.util.ConnectionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +17,7 @@ import java.awt.*;
  * @since 2024-12-25
  */
 public class SettingsPanel extends EmbeddablePanel implements ConnectionManager.ConnectionListener {
-    private static final Logger LOG = LoggerFactory.getLogger(SettingsPanel.class);
+
 
     private AppConfig cfg;
     private JComboBox<String> cbDbConnections;
@@ -75,7 +75,7 @@ public class SettingsPanel extends EmbeddablePanel implements ConnectionManager.
      * Called when a different configuration file is loaded at runtime.
      */
     public void reloadAllSettings() {
-        LOG.info("Reloading all settings from configuration");
+        TimelineLogger.info(SettingsPanel.class, "Reloading all settings from configuration");
 
         // Reload DB connections
         ConnectionManager.reloadConnections();
@@ -124,7 +124,7 @@ public class SettingsPanel extends EmbeddablePanel implements ConnectionManager.
             chkOnlyTestClz.setSelected(cfg.getBool("LAST_USE_ONLY_TEST_CLZ"));
         }
 
-        LOG.debug("All settings reloaded");
+        TimelineLogger.debug(SettingsPanel.class, "All settings reloaded");
     }
 
     private void refreshDbConnections() {
@@ -254,7 +254,7 @@ public class SettingsPanel extends EmbeddablePanel implements ConnectionManager.
 
         add(new JScrollPane(content), BorderLayout.CENTER);
 
-        LOG.debug("SettingsPanel initialized");
+        TimelineLogger.debug(SettingsPanel.class, "SettingsPanel initialized");
     }
 
     /**
@@ -305,6 +305,6 @@ public class SettingsPanel extends EmbeddablePanel implements ConnectionManager.
      */
     public void dispose() {
         ConnectionManager.removeListener(this);
-        LOG.debug("SettingsPanel disposed");
+        TimelineLogger.debug(SettingsPanel.class, "SettingsPanel disposed");
     }
 }

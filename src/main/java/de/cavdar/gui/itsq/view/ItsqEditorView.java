@@ -2,13 +2,12 @@ package de.cavdar.gui.itsq.view;
 
 import de.cavdar.gui.itsq.design.ItsqEditorPanel;
 import de.cavdar.gui.itsq.model.ItsqItem;
+import de.cavdar.gui.util.TimelineLogger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.SearchContext;
 import org.fife.ui.rtextarea.SearchEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -29,7 +28,6 @@ import java.util.List;
  * - Properties mode: Table editor for .cfg and .properties files with Name/Value columns
  */
 public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectable {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqEditorView.class);
 
     private static final String CARD_XML = "xml";
     private static final String CARD_PROPERTIES = "properties";
@@ -381,9 +379,9 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
             setModified(false);
             updateTitle(file.getName());
             updateStatus("Geladen: " + file.getName());
-            LOG.info("Loaded XML file: {}", file.getAbsolutePath());
+            TimelineLogger.info(ItsqEditorView.class, "Loaded XML file: {}", file.getAbsolutePath());
         } catch (IOException e) {
-            LOG.error("Failed to load file: {}", file.getAbsolutePath(), e);
+            TimelineLogger.error(ItsqEditorView.class, "Failed to load file: {}", file.getAbsolutePath(), e);
             textArea.setText("Fehler beim Laden: " + e.getMessage());
             updateTitle(file.getName() + " (Fehler)");
         }
@@ -399,9 +397,9 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
             setModified(false);
             updateTitle(file.getName());
             updateStatus("Geladen: " + file.getName() + " (" + propertiesTableModel.getRowCount() + " Eintraege)");
-            LOG.info("Loaded properties file: {}", file.getAbsolutePath());
+            TimelineLogger.info(ItsqEditorView.class, "Loaded properties file: {}", file.getAbsolutePath());
         } catch (IOException e) {
-            LOG.error("Failed to load properties file: {}", file.getAbsolutePath(), e);
+            TimelineLogger.error(ItsqEditorView.class, "Failed to load properties file: {}", file.getAbsolutePath(), e);
             propertiesTableModel.clear();
             updateTitle(file.getName() + " (Fehler)");
         }
@@ -440,7 +438,7 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
                 saveXmlFile(file);
             }
         } catch (IOException e) {
-            LOG.error("Failed to save file: {}", file.getAbsolutePath(), e);
+            TimelineLogger.error(ItsqEditorView.class, "Failed to save file: {}", file.getAbsolutePath(), e);
             JOptionPane.showMessageDialog(this,
                     "Fehler beim Speichern: " + e.getMessage(),
                     "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -454,7 +452,7 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         Files.writeString(file.toPath(), textArea.getText(), StandardCharsets.UTF_8);
         setModified(false);
         updateStatus("Gespeichert: " + file.getName());
-        LOG.info("Saved XML file: {}", file.getAbsolutePath());
+        TimelineLogger.info(ItsqEditorView.class, "Saved XML file: {}", file.getAbsolutePath());
     }
 
     /**
@@ -465,7 +463,7 @@ public class ItsqEditorView extends ItsqEditorPanel implements ItsqItemSelectabl
         Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
         setModified(false);
         updateStatus("Gespeichert: " + file.getName());
-        LOG.info("Saved properties file: {}", file.getAbsolutePath());
+        TimelineLogger.info(ItsqEditorView.class, "Saved properties file: {}", file.getAbsolutePath());
     }
 
     // ===== Properties CRUD Operations =====

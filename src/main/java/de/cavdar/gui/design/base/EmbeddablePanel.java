@@ -1,7 +1,7 @@
 package de.cavdar.gui.design.base;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +16,7 @@ import java.awt.*;
  * @since 2024-12-25
  */
 public abstract class EmbeddablePanel extends JPanel {
-    private static final Logger LOG = LoggerFactory.getLogger(EmbeddablePanel.class);
+
 
     private final String panelName;
 
@@ -29,7 +29,7 @@ public abstract class EmbeddablePanel extends JPanel {
         this.panelName = name;
         setLayout(new BorderLayout());
         initializePanel();
-        LOG.debug("EmbeddablePanel created: {}", name);
+        TimelineLogger.debug(EmbeddablePanel.class, "EmbeddablePanel created: {}", name);
     }
 
     /**

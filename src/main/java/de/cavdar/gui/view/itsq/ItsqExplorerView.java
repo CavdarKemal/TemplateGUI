@@ -3,9 +3,8 @@ package de.cavdar.gui.view.itsq;
 import de.cavdar.gui.design.base.BaseViewPanel;
 import de.cavdar.gui.itsq.view.ItsqMainView;
 import de.cavdar.gui.model.base.AppConfig;
+import de.cavdar.gui.util.TimelineLogger;
 import de.cavdar.gui.view.base.BaseView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -28,7 +27,6 @@ import java.awt.event.KeyEvent;
  * @version 5.0
  */
 public class ItsqExplorerView extends BaseView {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqExplorerView.class);
 
     private ItsqMainView mainView;
 
@@ -44,7 +42,7 @@ public class ItsqExplorerView extends BaseView {
             }
         });
 
-        LOG.debug("ItsqExplorerView created");
+        TimelineLogger.debug(ItsqExplorerView.class, "ItsqExplorerView created");
     }
 
     @Override

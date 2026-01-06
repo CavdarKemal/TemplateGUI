@@ -1,11 +1,10 @@
 package de.cavdar.gui.view.prozess;
-import de.cavdar.gui.view.base.BaseView;
 
 import de.cavdar.gui.design.base.BaseViewPanel;
 import de.cavdar.gui.design.prozess.ProzessViewPanel;
 import de.cavdar.gui.util.IconLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
+import de.cavdar.gui.view.base.BaseView;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
@@ -24,7 +23,6 @@ import java.awt.event.KeyEvent;
  * @since 2024-12-25
  */
 public class ProzessView extends BaseView {
-    private static final Logger LOG = LoggerFactory.getLogger(ProzessView.class);
 
     private ProzessViewPanel prozessPanel;
 
@@ -33,7 +31,7 @@ public class ProzessView extends BaseView {
      */
     public ProzessView() {
         super("Prozess");
-        LOG.debug("ProzessView created");
+        TimelineLogger.debug(ProzessView.class, "ProzessView created");
     }
 
     @Override
@@ -74,7 +72,7 @@ public class ProzessView extends BaseView {
 
     private void startProcess() {
         executeTask(() -> {
-            LOG.info("Starting process");
+            TimelineLogger.info(ProzessView.class, "Starting process");
             appendLog("Prozess gestartet...");
             for (int i = 1; i <= 5; i++) {
                 try {
@@ -83,13 +81,13 @@ public class ProzessView extends BaseView {
                     SwingUtilities.invokeLater(() ->
                             appendLog("Schritt " + step + "/5 abgeschlossen"));
                 } catch (InterruptedException ex) {
-                    LOG.warn("Process interrupted", ex);
+                    TimelineLogger.warn(ProzessView.class, "Process interrupted", ex);
                     Thread.currentThread().interrupt();
                     return;
                 }
             }
             SwingUtilities.invokeLater(() -> appendLog("Prozess beendet."));
-            LOG.info("Process completed");
+            TimelineLogger.info(ProzessView.class, "Process completed");
         });
     }
 

@@ -1,8 +1,5 @@
 package de.cavdar.gui.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.swing.*;
 import java.net.URL;
 
@@ -14,7 +11,6 @@ import java.net.URL;
  * @since 2024-12-26
  */
 public final class IconLoader {
-    private static final Logger LOG = LoggerFactory.getLogger(IconLoader.class);
     private static final String ICONS_PATH = "icons/";
 
     private IconLoader() {
@@ -32,7 +28,7 @@ public final class IconLoader {
         if (url != null) {
             return new ImageIcon(url);
         }
-        LOG.warn("Icon not found: {}", name);
+        TimelineLogger.warn(IconLoader.class, "Icon not found: {}", name);
         return null;
     }
 

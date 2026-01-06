@@ -1,8 +1,7 @@
 package de.cavdar.gui.model.base;
 
 import de.cavdar.gui.exception.ConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +24,6 @@ import java.util.Properties;
  * @since 2024-12-24
  */
 public class AppConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(AppConfig.class);
     private static final String DEFAULT_FILE_PATH = "ene-config.properties";
     private static final String INITIAL_FILE_PATH;
     private static final AppConfig INSTANCE;
@@ -37,10 +35,10 @@ public class AppConfig {
 
         if (sysProp != null && !sysProp.isEmpty()) {
             INITIAL_FILE_PATH = sysProp;
-            LOG.info("Using config path from system property: {}", INITIAL_FILE_PATH);
+            TimelineLogger.info(AppConfig.class, "Using config path from system property: {}", INITIAL_FILE_PATH);
         } else if (envPath != null && !envPath.isEmpty()) {
             INITIAL_FILE_PATH = envPath;
-            LOG.info("Using config path from environment: {}", INITIAL_FILE_PATH);
+            TimelineLogger.info(AppConfig.class, "Using config path from environment: {}", INITIAL_FILE_PATH);
         } else {
             INITIAL_FILE_PATH = DEFAULT_FILE_PATH;
         }
@@ -173,7 +171,7 @@ public class AppConfig {
     public boolean loadFrom(String path) {
         File file = new File(path);
         if (!file.exists() || !file.isFile()) {
-            LOG.error("Config file not found: {}", path);
+            TimelineLogger.error(AppConfig.class, "Config file not found: {}", path);
             return false;
         }
 
@@ -181,10 +179,10 @@ public class AppConfig {
             props.clear();
             props.load(is);
             currentFilePath = file.getAbsolutePath();
-            LOG.info("Configuration loaded from {} (now active for saving)", currentFilePath);
+            TimelineLogger.info(AppConfig.class, "Configuration loaded from {} (now active for saving)", currentFilePath);
             return true;
         } catch (IOException e) {
-            LOG.error("Failed to load configuration from {}", path, e);
+            TimelineLogger.error(AppConfig.class, "Failed to load configuration from {}", path, e);
             return false;
         }
     }
@@ -199,18 +197,18 @@ public class AppConfig {
     private void load() {
         try (InputStream is = new FileInputStream(currentFilePath)) {
             props.load(is);
-            LOG.info("Configuration loaded successfully from {}", currentFilePath);
+            TimelineLogger.info(AppConfig.class, "Configuration loaded successfully from {}", currentFilePath);
         } catch (FileNotFoundException e) {
-            LOG.warn("Configuration file not found: {}. Using default values.", currentFilePath);
+            TimelineLogger.warn(AppConfig.class, "Configuration file not found: {}. Using default values.", currentFilePath);
             initializeDefaults();
         } catch (IOException e) {
-            LOG.error("Failed to load configuration from {}", currentFilePath, e);
+            TimelineLogger.error(AppConfig.class, "Failed to load configuration from {}", currentFilePath, e);
             initializeDefaults();
         }
     }
 
     private void initializeDefaults() {
-        LOG.info("Initializing default configuration values");
+        TimelineLogger.info(AppConfig.class, "Initializing default configuration values");
         props.setProperty("TEST-BASE-PATH", "/X-TESTS/ENE");
         props.setProperty("TEST-SOURCES", "ITSQ;LOCAL;REMOTE");
         props.setProperty("TEST-TYPES", "UNIT;INTEGRATION;E2E");
@@ -232,11 +230,11 @@ public class AppConfig {
      */
     public void setProperty(String key, String value) {
         if (key == null || value == null) {
-            LOG.warn("Attempted to set property with null key or value");
+            TimelineLogger.warn(AppConfig.class, "Attempted to set property with null key or value");
             return;
         }
         props.setProperty(key, value);
-        LOG.debug("Property set: {} = {}", key, value);
+        TimelineLogger.debug(AppConfig.class, "Property set: {} = {}", key, value);
     }
 
     /**
@@ -283,7 +281,7 @@ public class AppConfig {
             String propertyX = getPropertyX(key, String.valueOf(def));
             return Integer.parseInt(propertyX);
         } catch (NumberFormatException e) {
-            LOG.warn("Invalid integer value for key '{}', using default: {}", key, def);
+            TimelineLogger.warn(AppConfig.class, "Invalid integer value for key '{}', using default: {}", key, def);
             return def;
         }
     }
@@ -305,7 +303,7 @@ public class AppConfig {
         File parentDir = configFile.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
             if (parentDir.mkdirs()) {
-                LOG.info("Created config directory: {}", parentDir.getAbsolutePath());
+                TimelineLogger.info(AppConfig.class, "Created config directory: {}", parentDir.getAbsolutePath());
             }
         }
 
@@ -360,9 +358,9 @@ public class AppConfig {
                 }
             }
 
-            LOG.info("Configuration saved to {}", currentFilePath);
+            TimelineLogger.info(AppConfig.class, "Configuration saved to {}", currentFilePath);
         } catch (IOException e) {
-            LOG.error("Failed to save configuration to {}", currentFilePath, e);
+            TimelineLogger.error(AppConfig.class, "Failed to save configuration to {}", currentFilePath, e);
             throw new ConfigurationException("Failed to save configuration", e);
         }
     }

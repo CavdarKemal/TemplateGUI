@@ -1,8 +1,7 @@
 package de.cavdar.gui.itsq.tree;
 
 import de.cavdar.gui.itsq.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.cavdar.gui.util.TimelineLogger;
 
 import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
@@ -27,7 +26,6 @@ import java.util.Comparator;
  *           - *.properties
  */
 public class ItsqTreeModel extends DefaultTreeModel {
-    private static final Logger LOG = LoggerFactory.getLogger(ItsqTreeModel.class);
 
     private static final String ARCHIV_BESTAND = "ARCHIV-BESTAND";
     private static final String REF_EXPORTS = "REF-EXPORTS";
@@ -78,7 +76,7 @@ public class ItsqTreeModel extends DefaultTreeModel {
     public void reload(File itsqDir, String filterText, boolean activeOnly,
                        String sourceFilter, String phaseFilter) {
         if (itsqDir == null || !itsqDir.exists() || !itsqDir.isDirectory()) {
-            LOG.warn("Invalid ITSQ directory: {}", itsqDir);
+            TimelineLogger.warn(ItsqTreeModel.class, "Invalid ITSQ directory: {}", itsqDir);
             return;
         }
 
@@ -103,7 +101,7 @@ public class ItsqTreeModel extends DefaultTreeModel {
         // Notify listeners
         reload(rootNode);
 
-        LOG.info("Loaded ITSQ directory: {} ({} files, {} dirs, filter: '{}', source: '{}', phase: '{}', activeOnly: {})",
+        TimelineLogger.info(ItsqTreeModel.class, "Loaded ITSQ directory: {} ({} files, {} dirs, filter: '{}', source: '{}', phase: '{}', activeOnly: {})",
                 itsqDir.getAbsolutePath(), totalFiles, totalDirs, filterText, sourceFilter, phaseFilter, activeOnly);
     }
 
