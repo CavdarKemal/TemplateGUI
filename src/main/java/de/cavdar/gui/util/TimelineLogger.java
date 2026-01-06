@@ -1,8 +1,9 @@
 package de.cavdar.gui.util;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.time.Duration;
@@ -37,7 +38,11 @@ public class TimelineLogger {
     private static final String LOG_FILE_NAME = "timeline.log";
     private static final String PATTERN = "%d{dd.MM.yyyy HH:mm:ss.SSS} | %m%n";
 
-    private static final Logger TIMELINE = Logger.getLogger(LOGGER_NAME);
+    // SLF4J Logger for logging calls
+    private static final Logger TIMELINE = LoggerFactory.getLogger(LOGGER_NAME);
+    // Log4j Logger for appender configuration
+    private static final org.apache.log4j.Logger LOG4J_TIMELINE = org.apache.log4j.Logger.getLogger(LOGGER_NAME);
+
     private static final Map<String, ActionInfo> activeActions = new ConcurrentHashMap<>();
 
     private static RollingFileAppender fileAppender;
@@ -45,7 +50,7 @@ public class TimelineLogger {
 
     static {
         // Prevent log propagation to root logger
-        TIMELINE.setAdditivity(false);
+        LOG4J_TIMELINE.setAdditivity(false);
     }
 
     private TimelineLogger() {
@@ -81,8 +86,8 @@ public class TimelineLogger {
             fileAppender.setAppend(true);
             fileAppender.activateOptions();
 
-            TIMELINE.addAppender(fileAppender);
-            TIMELINE.info("Timeline logger initialized: " + logFile.getAbsolutePath());
+            LOG4J_TIMELINE.addAppender(fileAppender);
+            TIMELINE.info("Timeline logger initialized: {}", logFile.getAbsolutePath());
             return true;
         } catch (Exception e) {
             System.err.println("[TimelineLogger] Error configuring: " + e.getMessage());
@@ -96,7 +101,7 @@ public class TimelineLogger {
     public static void close() {
         if (fileAppender != null) {
             fileAppender.close();
-            TIMELINE.removeAppender(fileAppender);
+            LOG4J_TIMELINE.removeAppender(fileAppender);
             fileAppender = null;
         }
         activeActions.clear();
@@ -155,7 +160,7 @@ public class TimelineLogger {
     public static void end(String actionId, String result) {
         ActionInfo info = activeActions.remove(actionId);
         if (info == null) {
-            TIMELINE.warn("END   | action=UNKNOWN | id=" + actionId + " | error=No matching start");
+            TIMELINE.warn("END   | action=UNKNOWN | id={} | error=No matching start", actionId);
             return;
         }
 
