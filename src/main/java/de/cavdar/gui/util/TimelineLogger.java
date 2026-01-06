@@ -187,81 +187,51 @@ public class TimelineLogger {
             }
 
             // Configure application logger
-            boolean appConfigured = configureAppLogger(new File(logOutputDir, appLogFileName));
+            appAppender = configureAppender(appAppender, APP_APPENDER_NAME, APP_PATTERN,
+                    new File(logOutputDir, appLogFileName));
+            if (appAppender == null) return false;
+            org.apache.log4j.Logger.getRootLogger().addAppender(appAppender);
 
             // Configure timeline logger
-            boolean timelineConfigured = configureTimelineLogger(new File(logOutputDir, actionLogFileName));
+            timelineAppender = configureAppender(timelineAppender, TIMELINE_APPENDER_NAME, TIMELINE_PATTERN,
+                    new File(logOutputDir, actionLogFileName));
+            if (timelineAppender == null) return false;
+            if (!LOG4J_TIMELINE.isAttached(timelineAppender)) {
+                LOG4J_TIMELINE.addAppender(timelineAppender);
+            }
 
-            return appConfigured && timelineConfigured;
+            return true;
         } catch (Exception e) {
             System.err.println("[TimelineLogger] Error configuring: " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Configures the application file appender.
-     */
-    private static boolean configureAppLogger(File logFile) {
+    private static RollingFileAppender configureAppender(RollingFileAppender existingAppender,
+                                                         String appenderName, String pattern, File logFile) {
         try {
-            org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
-
-            if (appAppender != null) {
+            if (existingAppender != null) {
                 // Update existing appender
-                appAppender.setFile(logFile.getAbsolutePath());
-                appAppender.activateOptions();
-                System.out.println("[TimelineLogger] App logger reconfigured: " + logFile.getAbsolutePath());
-                return true;
+                existingAppender.setFile(logFile.getAbsolutePath());
+                existingAppender.activateOptions();
+                System.out.println("[TimelineLogger] " + appenderName + " reconfigured: " + logFile.getAbsolutePath());
+                return existingAppender;
             }
 
             // Create new appender
-            appAppender = new RollingFileAppender();
-            appAppender.setName(APP_APPENDER_NAME);
-            appAppender.setFile(logFile.getAbsolutePath());
-            appAppender.setMaxFileSize("10MB");
-            appAppender.setMaxBackupIndex(10);
-            appAppender.setLayout(new PatternLayout(APP_PATTERN));
-            appAppender.setAppend(true);
-            appAppender.activateOptions();
-
-            rootLogger.addAppender(appAppender);
-            System.out.println("[TimelineLogger] App logger initialized: " + logFile.getAbsolutePath());
-            return true;
+            RollingFileAppender appender = new RollingFileAppender();
+            appender.setName(appenderName);
+            appender.setFile(logFile.getAbsolutePath());
+            appender.setMaxFileSize("10MB");
+            appender.setMaxBackupIndex(5);
+            appender.setLayout(new PatternLayout(pattern));
+            appender.setAppend(true);
+            appender.activateOptions();
+            System.out.println("[TimelineLogger] " + appenderName + " initialized: " + logFile.getAbsolutePath());
+            return appender;
         } catch (Exception e) {
-            System.err.println("[TimelineLogger] Error configuring app logger: " + e.getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Configures the timeline file appender.
-     */
-    private static boolean configureTimelineLogger(File logFile) {
-        try {
-            if (timelineAppender != null) {
-                // Update existing appender
-                timelineAppender.setFile(logFile.getAbsolutePath());
-                timelineAppender.activateOptions();
-                System.out.println("[TimelineLogger] Timeline logger reconfigured: " + logFile.getAbsolutePath());
-                return true;
-            }
-
-            // Create new appender
-            timelineAppender = new RollingFileAppender();
-            timelineAppender.setName(TIMELINE_APPENDER_NAME);
-            timelineAppender.setFile(logFile.getAbsolutePath());
-            timelineAppender.setMaxFileSize("10MB");
-            timelineAppender.setMaxBackupIndex(5);
-            timelineAppender.setLayout(new PatternLayout(TIMELINE_PATTERN));
-            timelineAppender.setAppend(true);
-            timelineAppender.activateOptions();
-
-            LOG4J_TIMELINE.addAppender(timelineAppender);
-            System.out.println("[TimelineLogger] Timeline logger initialized: " + logFile.getAbsolutePath());
-            return true;
-        } catch (Exception e) {
-            System.err.println("[TimelineLogger] Error configuring timeline logger: " + e.getMessage());
-            return false;
+            System.err.println("[TimelineLogger] Error configuring " + appenderName + ": " + e.getMessage());
+            return null;
         }
     }
 
