@@ -237,7 +237,39 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         refreshConfigList();
 
         // Initialize test environment for current config at startup
-        TestEnvironmentManager.switchEnvironment(currentConfigName);
+        if (!TestEnvironmentManager.switchEnvironment(currentConfigName)) {
+            // Environment is locked - try to find an unlocked one
+            String envName = currentConfigName.length() >= 3 ? currentConfigName.substring(0, 3).toUpperCase() : currentConfigName;
+            boolean foundAlternative = false;
+
+            // Try other configs
+            for (int i = 0; i < configComboBox.getItemCount(); i++) {
+                String altConfig = configComboBox.getItemAt(i);
+                if (!altConfig.equals(currentConfigName)) {
+                    if (TestEnvironmentManager.switchEnvironment(altConfig)) {
+                        // Found unlocked environment
+                        currentConfigName = altConfig;
+                        configComboBox.setSelectedItem(altConfig);
+                        cfg.loadFrom(new File(configDirectory, altConfig).getAbsolutePath());
+                        setTitle("MDI Application - " + cfg.getProperty("TEST-BASE-PATH") + " [" + altConfig + "]");
+                        foundAlternative = true;
+                        JOptionPane.showMessageDialog(this,
+                                "Die Umgebung '" + envName + "' ist bereits von einer anderen Instanz gesperrt.\n" +
+                                "Gewechselt zu: " + altConfig.substring(0, 3).toUpperCase(),
+                                "Umgebung gesperrt", JOptionPane.WARNING_MESSAGE);
+                        break;
+                    }
+                }
+            }
+
+            if (!foundAlternative) {
+                JOptionPane.showMessageDialog(this,
+                        "Alle Umgebungen sind bereits von anderen Instanzen gesperrt.\n" +
+                        "Bitte schliessen Sie eine andere Instanz zuerst.",
+                        "Keine freie Umgebung", JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
+            }
+        }
 
         configComboBox.addActionListener(e -> {
             if (e.getActionCommand().equals("comboBoxChanged")) {
@@ -500,11 +532,22 @@ public class MainFrame extends JFrame implements ConnectionManager.ConnectionLis
         TimelineLogger.info(MainFrame.class, "Loading configuration: {}", configFile.getAbsolutePath());
 
         if (cfg.loadFrom(configFile.getAbsolutePath())) {
+            // Switch test environment (creates directories, acquires lock, configures logging)
+            if (!TestEnvironmentManager.switchEnvironment(configName)) {
+                // Environment is locked by another instance
+                String envName = configName.length() >= 3 ? configName.substring(0, 3).toUpperCase() : configName;
+                JOptionPane.showMessageDialog(this,
+                        "Die Umgebung '" + envName + "' ist bereits von einer anderen Instanz gesperrt.\n" +
+                        "Bitte schliessen Sie die andere Instanz zuerst.",
+                        "Umgebung gesperrt", JOptionPane.WARNING_MESSAGE);
+                // Reload old config
+                cfg.loadFrom(new File(configDirectory, currentConfigName).getAbsolutePath());
+                configComboBox.setSelectedItem(currentConfigName);
+                return;
+            }
+
             currentConfigName = configName;
             setTitle("MDI Application - " + cfg.getProperty("TEST-BASE-PATH") + " [" + configName + "]");
-
-            // Switch test environment (creates directories and configures logging)
-            TestEnvironmentManager.switchEnvironment(configName);
 
             reloadAllSettings();
             TimelineLogger.info(MainFrame.class, "Configuration loaded: {}", configName);

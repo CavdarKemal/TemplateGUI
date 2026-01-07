@@ -56,6 +56,7 @@ public class TestEnvironmentManager {
      */
     public static void reset() {
         closeLogging();
+        EnvironmentLockManager.releaseLock();
         currentEnvironment = null;
         currentEnvDir = null;
         currentLogsDir = null;
@@ -87,10 +88,10 @@ public class TestEnvironmentManager {
 
     /**
      * Switches to a new environment based on the config file name.
-     * Creates the necessary directories and reconfigures logging.
+     * Creates the necessary directories, acquires environment lock, and reconfigures logging.
      *
      * @param configFileName the config file name (e.g., "ene-config.properties")
-     * @return true if switch was successful
+     * @return true if switch was successful, false if environment is locked by another instance
      */
     public static boolean switchEnvironment(String configFileName) {
         String envName = extractEnvironmentName(configFileName);
@@ -109,8 +110,25 @@ public class TestEnvironmentManager {
         File logsDir = new File(envDir, LOGS_DIR);
         File testOutputsDir = new File(envDir, TEST_OUTPUTS_DIR);
 
-        // Create directories
+        // Create directories first (needed for lock file)
         if (!createDirectories(logsDir, testOutputsDir)) {
+            return false;
+        }
+
+        // Check if new environment is locked by another instance
+        if (EnvironmentLockManager.isLocked(envDir)) {
+            TimelineLogger.warn(TestEnvironmentManager.class,
+                    "Environment {} is locked by another instance", envName);
+            return false;
+        }
+
+        // Release old lock (if any)
+        EnvironmentLockManager.releaseLock();
+
+        // Acquire lock for new environment
+        if (!EnvironmentLockManager.acquireLock(envDir, envName)) {
+            TimelineLogger.error(TestEnvironmentManager.class,
+                    "Could not acquire lock for environment: {}", envName);
             return false;
         }
 

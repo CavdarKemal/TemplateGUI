@@ -21,6 +21,17 @@
 
 ## Letzte Aenderungen
 
+**07.01.2026** - Umgebungs-Lock-System:
+- **EnvironmentLockManager**: Neue Utility-Klasse mit ServerSocket (Ports 47100-47102)
+- **Lock-Datei**: TEST-ENVS/{ENV}/.env.lock (nur Info, Lock via Port)
+- **TestEnvironmentManager**: Lock-Integration in switchEnvironment()
+- **MainFrame**: Lock-Pruefung beim Startup + Fehlermeldung bei Umgebungswechsel
+- **Main**: Shutdown Hook fuer automatische Lock-Freigabe
+- **Verhalten**:
+  - Startup: Wenn Umgebung gesperrt, automatischer Wechsel zu freier Umgebung
+  - Umgebungswechsel: Fehlermeldung wenn Ziel-Umgebung gesperrt
+  - App-Crash: Port wird vom OS freigegeben
+
 **05.01.2026** - ItsqEditorView Dual-Modus:
 - **XML-Modus**: RSyntaxTextArea mit Syntax-Highlighting, Suche (F3/Shift+F3)
 - **Properties-Modus**: Tabellen-Editor mit Name/Wert-Spalten, CRUD-Buttons
@@ -90,7 +101,7 @@ de.cavdar.gui/
 │   ├── db/                     # DatabaseView
 │   └── json/                   # ItsqTreeView
 ├── model/base/                 # AppConfig, ConfigEntry, ConnectionInfo
-├── util/                       # ConnectionManager, IconLoader, TestEnvironmentManager
+├── util/                       # ConnectionManager, IconLoader, TestEnvironmentManager, EnvironmentLockManager
 ├── exception/                  # ConfigurationException
 └── itsq/                       # ITSQ Explorer (JFormDesigner)
     ├── design/                 # ItsqMainPanel, ItsqTreePanel, etc.
@@ -127,13 +138,12 @@ de.cavdar.gui/
 
 ```
 Ich arbeite am Java-Projekt TemplateGUI unter E:\Projekte\ClaudeCode\TemplateGUI.
-Bitte lies docs/CLAUDE_CONTEXT.md und docs/gui.md fuer den Kontext.
+Bitte lies die Datei docs/CLAUDE_CONTEXT.md fuer den Kontext.
 
-Aktueller Stand (05.01.2026):
-- ItsqEditorView mit Dual-Modus (XML/Properties) fertig
-- ItsqEditorPanel Toolbar via JFormDesigner (Neu/Aendern/Loeschen/Filter/Speichern)
-- CardLayout wechselt automatisch je nach Dateityp
-- PropertiesTableModel mit Filter und Kommentar-Erhaltung
+Aktueller Stand (07.01.2026):
+- Umgebungs-Lock-System implementiert (EnvironmentLockManager)
+- Lock verhindert, dass mehrere Instanzen dieselbe Umgebung nutzen
+- ItsqEditorView mit Dual-Modus (XML/Properties)
 
 Naechste moegliche Aufgaben:
 - GUI testen und Feintuning

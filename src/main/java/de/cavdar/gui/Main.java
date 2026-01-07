@@ -1,6 +1,7 @@
 package de.cavdar.gui;
 
 import de.cavdar.gui.design.base.MainFrame;
+import de.cavdar.gui.util.EnvironmentLockManager;
 import de.cavdar.gui.util.TimelineLogger;
 import de.cavdar.gui.view.itsq.ItsqExplorerView;
 import de.cavdar.gui.view.json.ItsqTreeView;
@@ -28,6 +29,9 @@ public class Main {
             System.setProperty("config.file", args[0]);
             TimelineLogger.info(Main.class, "Config file set from argument: {}", args[0]);
         }
+
+        // Register shutdown hook to release environment lock on exit
+        EnvironmentLockManager.registerShutdownHook();
 
         TimelineLogger.info(Main.class, "Starting MDI Application");
         SwingUtilities.invokeLater(() -> {
