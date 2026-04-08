@@ -6,16 +6,16 @@ services:
     image: postgres:15-alpine
     container_name: template-postgres
     environment:
-      POSTGRES_DB: templatedb
-      POSTGRES_USER: template
-      POSTGRES_PASSWORD: template123
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U template -d templatedb"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
